@@ -36,65 +36,104 @@ const DB = (() => {
       feat1:'أجهزة تشخيص حديثة', feat2:'أطباء معتمدون دولياً',
       feat3:'بروتوكولات تعقيم متقدمة', feat4:'مواعيد مرنة ودقيقة',
     },
-    social: {
-      instagram:'', twitter:'', snapchat:'', tiktok:'', facebook:'', youtube:'',
-    },
+    social: { instagram:'', twitter:'', snapchat:'', tiktok:'', facebook:'', youtube:'' },
     doctors: [
-      {id:1,name:'د. أحمد المنصوري', specialty:'تقويم وجراحة الفم',    img:'',workDays:[0,1,2,3,4],  startTime:'9:00', endTime:'17:00',slotDuration:30},
-      {id:2,name:'د. سارة الزهراني', specialty:'زراعة الأسنان',         img:'',workDays:[0,1,2,4,6],  startTime:'10:00',endTime:'18:00',slotDuration:45},
-      {id:3,name:'د. خالد العتيبي',  specialty:'طب الأسنان التجميلي',   img:'',workDays:[1,2,3,4,5],  startTime:'8:00', endTime:'16:00',slotDuration:30},
-      {id:4,name:'د. نورة الشمري',   specialty:'طب أسنان الأطفال',      img:'',workDays:[0,1,2,3,4,5],startTime:'9:00', endTime:'17:00',slotDuration:30},
+      {id:1,name:'د. أحمد المنصوري',specialty:'تقويم وجراحة الفم',   img:'',workDays:[0,1,2,3,4],  startTime:'9:00', endTime:'17:00',slotDuration:30},
+      {id:2,name:'د. سارة الزهراني',specialty:'زراعة الأسنان',        img:'',workDays:[0,1,2,4,6],  startTime:'10:00',endTime:'18:00',slotDuration:45},
+      {id:3,name:'د. خالد العتيبي', specialty:'طب الأسنان التجميلي',  img:'',workDays:[1,2,3,4,5],  startTime:'8:00', endTime:'16:00',slotDuration:30},
+      {id:4,name:'د. نورة الشمري',  specialty:'طب أسنان الأطفال',     img:'',workDays:[0,1,2,3,4,5],startTime:'9:00', endTime:'17:00',slotDuration:30},
     ],
     specialties: [
-      {icon:'fa fa-teeth',      title:'تقويم الأسنان',     desc:'علاج اعوجاج الأسنان بأحدث تقنيات التقويم الشفاف والمعدني.'},
-      {icon:'fa fa-tooth',      title:'زراعة الأسنان',      desc:'حلول دائمة لفقدان الأسنان باستخدام أفضل أنواع الغرسات.'},
-      {icon:'fa fa-star',       title:'الأسنان التجميلية', desc:'تحسين مظهر ابتسامتك عبر الفينيرز والقشور الخزفية.'},
-      {icon:'fa fa-syringe',    title:'علاج جذور الأسنان', desc:'حل فعال لإنقاذ الأسنان المتضررة من العدوى والتلف.'},
-      {icon:'fa fa-face-smile', title:'تبييض الأسنان',     desc:'جلسات احترافية بأنظمة مرخصة وآمنة تمنحك بريقاً ساطعاً.'},
-      {icon:'fa fa-child',      title:'طب أسنان الأطفال',  desc:'رعاية متخصصة ولطيفة في بيئة ودية تقلل من القلق.'},
+      {icon:'fa fa-teeth',      title:'تقويم الأسنان',    desc:'علاج اعوجاج الأسنان بأحدث تقنيات التقويم الشفاف والمعدني.'},
+      {icon:'fa fa-tooth',      title:'زراعة الأسنان',     desc:'حلول دائمة لفقدان الأسنان باستخدام أفضل أنواع الغرسات.'},
+      {icon:'fa fa-star',       title:'الأسنان التجميلية',desc:'تحسين مظهر ابتسامتك عبر الفينيرز والقشور الخزفية.'},
+      {icon:'fa fa-syringe',    title:'علاج جذور الأسنان',desc:'حل فعال لإنقاذ الأسنان المتضررة من العدوى والتلف.'},
+      {icon:'fa fa-face-smile', title:'تبييض الأسنان',    desc:'جلسات احترافية بأنظمة مرخصة وآمنة تمنحك بريقاً ساطعاً.'},
+      {icon:'fa fa-child',      title:'طب أسنان الأطفال', desc:'رعاية متخصصة ولطيفة في بيئة ودية تقلل من القلق.'},
     ],
     reviews: [
-      {name:'أم عبدالله',initial:'أ',rating:5,text:'تجربة رائعة جداً! الطاقم محترف ومتفهم.',date:'منذ أسبوع',doctor:'د. أحمد المنصوري'},
-      {name:'محمد الغامدي',initial:'م',rating:5,text:'أفضل مركز زرته. الدكتورة سارة خبيرة.',date:'منذ شهر',doctor:'د. سارة الزهراني'},
-      {name:'نوف الحربي',initial:'ن',rating:5,text:'جئت للتجميل وخرجت بابتسامة أحلم بها!',date:'منذ 3 أسابيع',doctor:'د. خالد العتيبي'},
-      {name:'عبدالرحمن الدوسري',initial:'ع',rating:4,text:'المركز ممتاز والمواعيد دقيقة.',date:'منذ شهرين',doctor:'د. خالد العتيبي'},
-      {name:'هيفاء القحطاني',initial:'ه',rating:5,text:'ابنتي كانت تخاف حتى جاءت هنا!',date:'منذ أسبوعين',doctor:'د. نورة الشمري'},
-      {name:'فهد الشهراني',initial:'ف',rating:5,text:'زرعة الأسنان اكتملت بنجاح. فريق محترف.',date:'منذ شهر',doctor:'د. سارة الزهراني'},
+      {name:'أم عبدالله',       initial:'أ',rating:5,text:'تجربة رائعة جداً! الطاقم محترف ومتفهم.',          date:'منذ أسبوع',   doctor:'د. أحمد المنصوري'},
+      {name:'محمد الغامدي',     initial:'م',rating:5,text:'أفضل مركز زرته. الدكتورة سارة خبيرة.',           date:'منذ شهر',     doctor:'د. سارة الزهراني'},
+      {name:'نوف الحربي',       initial:'ن',rating:5,text:'جئت للتجميل وخرجت بابتسامة أحلم بها!',           date:'منذ 3 أسابيع',doctor:'د. خالد العتيبي'},
+      {name:'عبدالرحمن الدوسري',initial:'ع',rating:4,text:'المركز ممتاز والمواعيد دقيقة.',                  date:'منذ شهرين',   doctor:'د. خالد العتيبي'},
+      {name:'هيفاء القحطاني',   initial:'ه',rating:5,text:'ابنتي كانت تخاف حتى جاءت هنا!',                 date:'منذ أسبوعين', doctor:'د. نورة الشمري'},
+      {name:'فهد الشهراني',     initial:'ف',rating:5,text:'زرعة الأسنان اكتملت بنجاح. فريق محترف.',        date:'منذ شهر',     doctor:'د. سارة الزهراني'},
     ],
     hoursOverride: null,
   };
 
-  function hdrs(){return{'Content-Type':'application/json','X-Master-Key':API_KEY,'X-Bin-Versioning':'false'}}
-  function ok(){return BIN_ID&&API_KEY}
-
-  async function read(){
-    if(!ok())return JSON.parse(JSON.stringify(DEFAULTS));
-    const now=Date.now();
-    if(_cache&&now-_lastFetch<TTL)return _cache;
-    try{
-      const r=await fetch(`${BASE}/b/${BIN_ID}/latest`,{headers:hdrs()});
-      if(!r.ok)throw new Error(r.status);
-      const j=await r.json();
-      _cache={...DEFAULTS,...j.record};
-      if(!_cache.hero)_cache.hero=DEFAULTS.hero;
-      if(!_cache.about)_cache.about=DEFAULTS.about;
-      if(!_cache.social)_cache.social=DEFAULTS.social;
-      _lastFetch=now;
-      return _cache;
-    }catch(e){return _cache||JSON.parse(JSON.stringify(DEFAULTS))}
+  // ===== إصلاح رئيسي: دمج عميق للكائنات المتداخلة =====
+  // المشكلة القديمة: {...DEFAULTS, ...record} يستبدل hero/about/social بالكامل
+  // الحل: دمج كل كائن متداخل على حدة
+  function deepMerge(defaults, saved) {
+    const result = JSON.parse(JSON.stringify(defaults));
+    if (!saved || typeof saved !== 'object') return result;
+    Object.keys(saved).forEach(k => {
+      const isNestedObj =
+        saved[k] !== null &&
+        typeof saved[k] === 'object' &&
+        !Array.isArray(saved[k]) &&
+        result[k] !== undefined &&
+        typeof result[k] === 'object';
+      if (isNestedObj) {
+        result[k] = { ...result[k], ...saved[k] };
+      } else {
+        result[k] = saved[k];
+      }
+    });
+    return result;
   }
 
-  async function write(data){
-    if(!ok())throw new Error('DB not configured');
-    _cache=data;_lastFetch=0;
-    const r=await fetch(`${BASE}/b/${BIN_ID}`,{method:'PUT',headers:hdrs(),body:JSON.stringify(data)});
-    if(!r.ok)throw new Error('write failed: '+r.status);
+  function hdrs() {
+    return {
+      'Content-Type':     'application/json',
+      'X-Master-Key':     API_KEY,
+      'X-Bin-Versioning': 'false',
+    };
+  }
+
+  function ok() { return !!(BIN_ID && API_KEY); }
+
+  async function read() {
+    if (!ok()) return JSON.parse(JSON.stringify(DEFAULTS));
+    const now = Date.now();
+    if (_cache && (now - _lastFetch) < TTL) return _cache;
+    try {
+      const r = await fetch(`${BASE}/b/${BIN_ID}/latest`, { headers: hdrs() });
+      if (!r.ok) throw new Error('fetch ' + r.status);
+      const j = await r.json();
+      _cache = deepMerge(DEFAULTS, j.record);
+      _lastFetch = now;
+      return _cache;
+    } catch(e) {
+      console.warn('DB read error:', e.message);
+      return _cache || JSON.parse(JSON.stringify(DEFAULTS));
+    }
+  }
+
+  async function write(data) {
+    if (!ok()) throw new Error('DB not configured');
+    const r = await fetch(`${BASE}/b/${BIN_ID}`, {
+      method:  'PUT',
+      headers: hdrs(),
+      body:    JSON.stringify(data),
+    });
+    if (!r.ok) throw new Error('write failed: ' + r.status);
+    // تحديث الكاش مباشرة بعد الكتابة الناجحة
+    _cache = JSON.parse(JSON.stringify(data));
+    _lastFetch = Date.now();
     return true;
   }
 
-  function configure(b,k){BIN_ID=b;API_KEY=k;localStorage.setItem('db_bin_id',b);localStorage.setItem('db_api_key',k);_cache=null}
-  function getConfig(){return{binId:BIN_ID,apiKey:API_KEY}}
-  function isReady(){return ok()}
+  function configure(b, k) {
+    BIN_ID = b; API_KEY = k;
+    localStorage.setItem('db_bin_id', b);
+    localStorage.setItem('db_api_key', k);
+    _cache = null; _lastFetch = 0;
+  }
 
-  return{read,write,configure,getConfig,isReady,DEFAULTS};
+  function getConfig() { return { binId: BIN_ID, apiKey: API_KEY }; }
+  function isReady()   { return ok(); }
+
+  return { read, write, configure, getConfig, isReady, DEFAULTS };
 })();

@@ -386,7 +386,7 @@ async function boot(){
 
 function hideLoader(){const l=document.getElementById('page-loader');l.classList.add('hidden');setTimeout(()=>l.remove(),600)}
 
-function set(id,v){const e=document.getElementById(id);if(e&&v!==undefined&&v!=='')e.textContent=v}
+function set(id,v){const e=document.getElementById(id);if(e&&v!==undefined)e.textContent=v}
 
 function applyInfo(){
   const i=D.clinicInfo||{};
