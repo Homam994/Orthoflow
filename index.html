@@ -384,14 +384,86 @@
   .rebond-chart-box b { font-size: 0.73rem; color: var(--navy); display: block; margin-bottom: 6px; }
   .rebond-sel { font-size: 0.7rem; color: var(--grey-500); margin-top: 5px; }
 
+  /* ── Print: hide everything, show only the print summary overlay ── */
   @media print {
-    .page-header, .tab-nav-wrap, .progress-bar-wrap, .actions, .toast { display: none !important; }
-    body { background: white; }
-    .tab-panel { display: none !important; }
-    .tab-panel.active { display: block !important; }
-    .container { padding: 6px; max-width: 100%; }
-    .section-card { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; }
-    .section-card.collapsed .section-body { display: grid !important; }
+    body > *:not(#print-overlay) { display: none !important; }
+    #print-overlay { display: block !important; }
+  }
+
+  /* ── Print overlay (hidden on screen, visible on print) ── */
+  #print-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 99999;
+    background: white; overflow: auto;
+    font-family: 'DM Sans', sans-serif;
+    color: #1a2a35;
+  }
+
+  /* Print document layout */
+  .print-doc {
+    max-width: 210mm; margin: 0 auto;
+    padding: 14mm 16mm 16mm;
+    font-size: 10pt; line-height: 1.55;
+  }
+  .print-header {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    border-bottom: 2.5px solid #0d1b2a; padding-bottom: 10px; margin-bottom: 14px;
+  }
+  .print-logo { display: flex; align-items: center; gap: 10px; }
+  .print-logo-icon {
+    width: 38px; height: 38px; background: #1a7a7a; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .print-logo-text {}
+  .print-logo-title { font-family: 'DM Serif Display', serif; font-size: 15pt; color: #0d1b2a; display: block; line-height: 1.2; }
+  .print-logo-sub { font-size: 7pt; color: #5a7080; letter-spacing: 0.1em; text-transform: uppercase; display: block; margin-top: 2px; }
+  .print-meta { text-align: right; font-size: 8pt; color: #5a7080; }
+  .print-meta strong { display: block; font-size: 10pt; color: #0d1b2a; }
+  .print-visit-badge {
+    display: inline-block; background: #0d1b2a; color: white;
+    font-size: 8pt; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; padding: 3px 10px; border-radius: 4px;
+    margin-bottom: 12px;
+  }
+  .print-section { margin-bottom: 12px; break-inside: avoid; }
+  .print-section-title {
+    font-size: 8pt; font-weight: 700; letter-spacing: 0.09em;
+    text-transform: uppercase; color: #1a7a7a;
+    border-bottom: 1px solid #c2e8e8; padding-bottom: 3px;
+    margin-bottom: 7px;
+  }
+  .print-row {
+    display: flex; gap: 4px; margin-bottom: 4px;
+    padding: 3px 0; border-bottom: 1px dotted #dce4ea;
+  }
+  .print-row:last-child { border-bottom: none; }
+  .print-label {
+    font-size: 8.5pt; font-weight: 600; color: #5a7080;
+    min-width: 160px; flex-shrink: 0;
+  }
+  .print-value { font-size: 8.5pt; color: #1a2a35; flex: 1; }
+  .print-value.highlight { font-weight: 600; color: #0d1b2a; }
+  .print-aseptic {
+    background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 5px;
+    padding: 6px 10px; font-size: 8pt; color: #1a5c3a; font-weight: 600;
+    display: flex; gap: 7px; align-items: center; margin-top: 6px;
+  }
+  .print-footer {
+    margin-top: 18px; padding-top: 8px;
+    border-top: 1px solid #dce4ea;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 7.5pt; color: #93a7b5;
+  }
+  .print-sig-box {
+    border-top: 1px solid #0d1b2a; width: 160px;
+    text-align: center; padding-top: 4px; font-size: 7.5pt;
+    color: #5a7080; margin-top: 20px;
+  }
+  .print-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .print-confidential {
+    text-align: center; font-size: 7pt; color: #c5d1da;
+    letter-spacing: 0.12em; text-transform: uppercase; margin-top: 6px;
   }
   @media (max-width: 768px) {
     .page-header { padding: 9px 12px; }
@@ -2497,8 +2569,13 @@
 <div class="actions">
   <button class="btn btn-danger"  onclick="clearCurrentForm()">🗑 Clear</button>
   <button class="btn btn-outline" onclick="saveCurrentForm()">💾 Save Draft</button>
-  <button class="btn btn-print"   onclick="window.print()">🖨 Print</button>
+  <button class="btn btn-print"   onclick="printSummary()">🖨 Print</button>
   <button class="btn btn-primary" onclick="copyCurrentSummary()">📋 Copy Summary</button>
+</div>
+
+<!-- ═══ PRINT OVERLAY ═══ -->
+<div id="print-overlay">
+  <div class="print-doc" id="print-doc-content"></div>
 </div>
 
 <footer class="page-footer">
@@ -2730,22 +2807,28 @@ const activeEmPills = new Set();
 function toggleEmPill(el) { toggleEmChart(el); }
 function getEmTypes() { return [...activeEmPills].join(', '); }
 
-// ── Notation system (FDI default, Palmer optional) ────────────────────
+// ── Notation system (FDI / Palmer / Universal) ─────────────────────────
 let NOTATION = localStorage.getItem('ortho_notation') || 'FDI';
 
 const PALMER_MAP = {
-  // Upper right → UR8..UR1
   18:'UR8',17:'UR7',16:'UR6',15:'UR5',14:'UR4',13:'UR3',12:'UR2',11:'UR1',
-  // Upper left → UL1..UL8
   21:'UL1',22:'UL2',23:'UL3',24:'UL4',25:'UL5',26:'UL6',27:'UL7',28:'UL8',
-  // Lower right → LR8..LR1
   48:'LR8',47:'LR7',46:'LR6',45:'LR5',44:'LR4',43:'LR3',42:'LR2',41:'LR1',
-  // Lower left → LL1..LL8
   31:'LL1',32:'LL2',33:'LL3',34:'LL4',35:'LL5',36:'LL6',37:'LL7',38:'LL8'
 };
 
+// Universal (ADA) numbering — upper right to upper left, then lower left to lower right
+const UNIVERSAL_MAP = {
+  18:1,  17:2,  16:3,  15:4,  14:5,  13:6,  12:7,  11:8,
+  21:9,  22:10, 23:11, 24:12, 25:13, 26:14, 27:15, 28:16,
+  38:17, 37:18, 36:19, 35:20, 34:21, 33:22, 32:23, 31:24,
+  41:25, 42:26, 43:27, 44:28, 45:29, 46:30, 47:31, 48:32
+};
+
 function toothLabel(num) {
-  return NOTATION === 'Palmer' ? (PALMER_MAP[num] || num) : num;
+  if (NOTATION === 'Palmer')    return PALMER_MAP[num]    || num;
+  if (NOTATION === 'Universal') return UNIVERSAL_MAP[num] || num;
+  return num; // FDI
 }
 
 function applyNotationToCharts() {
@@ -3228,6 +3311,129 @@ async function copyCurrentSummary() {
     catch{ showToast('❌ Could not copy','error'); }
     document.body.removeChild(ta);
   }
+}
+
+// ── Professional Print ─────────────────────────────────────────────────
+const TAB_LABELS = {
+  'exam':       '🔍 Clinical Examination',
+  'plan':       '📝 Treatment Plan',
+  'bond':       '🔗 Bond-Up Visit',
+  'fu-fixed':   '🔩 Fixed Follow-Up',
+  'fu-aligner': '💎 Aligner Follow-Up',
+  'emergency':  '🚨 Emergency Visit',
+  'debond':     '✂️ Debond & Retainer',
+};
+
+function buildPrintHTML() {
+  const rawText = getCurrentSummary();
+  if (!rawText || rawText.length < 10) return null;
+
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-GB', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
+  const timeStr = now.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+  const visitLabel = TAB_LABELS[currentTab] || currentTab;
+  const notationLabel = NOTATION === 'Universal' ? 'Universal (ADA)' : NOTATION;
+
+  // Parse the raw summary text into sections and rows
+  const lines = rawText.split('\n');
+  let sections = [];
+  let currentSection = null;
+
+  lines.forEach(line => {
+    const trimmed = line.trim();
+    if (!trimmed) return;
+    if (!trimmed.startsWith('·')) {
+      // Section title
+      currentSection = { title: trimmed, rows: [] };
+      sections.push(currentSection);
+    } else {
+      // Data row
+      const content = trimmed.slice(1).trim();
+      const colonIdx = content.indexOf(':');
+      if (colonIdx > -1) {
+        const label = content.slice(0, colonIdx).trim();
+        const value = content.slice(colonIdx + 1).trim();
+        if (currentSection) currentSection.rows.push({ label, value });
+      } else {
+        if (currentSection) currentSection.rows.push({ label: '', value: content });
+      }
+    }
+  });
+
+  // Build HTML sections
+  let sectionsHTML = '';
+  sections.forEach(sec => {
+    if (!sec.rows.length) return;
+    let rowsHTML = sec.rows.map(r => `
+      <div class="print-row">
+        <span class="print-label">${r.label ? r.label + ':' : ''}</span>
+        <span class="print-value ${r.label === '' ? 'highlight' : ''}">${r.value}</span>
+      </div>`).join('');
+
+    // Special: aseptic row gets green styling
+    if (sec.rows.some(r => r.label.toLowerCase().includes('aseptic'))) {
+      rowsHTML = sec.rows.map(r => {
+        if (r.label.toLowerCase().includes('aseptic') && r.value) {
+          return `<div class="print-aseptic">🛡️ <span>Aseptic technique and appropriate PPE were maintained and observed throughout the entire procedure. <strong>Confirmed by Clinician.</strong></span></div>`;
+        }
+        return `<div class="print-row"><span class="print-label">${r.label ? r.label + ':' : ''}</span><span class="print-value">${r.value}</span></div>`;
+      }).join('');
+    }
+
+    sectionsHTML += `
+      <div class="print-section">
+        <div class="print-section-title">${sec.title}</div>
+        ${rowsHTML}
+      </div>`;
+  });
+
+  // Get clinic name if set
+  const clinicEl = document.getElementById('clinic-name-display');
+  const clinicName = (clinicEl && clinicEl.textContent !== 'Integrated Visit & Examination System')
+    ? clinicEl.textContent : 'Orthodontic Clinical Records';
+
+  return `
+    <div class="print-header">
+      <div class="print-logo">
+        <div class="print-logo-icon">🦷</div>
+        <div class="print-logo-text">
+          <span class="print-logo-title">${clinicName}</span>
+          <span class="print-logo-sub">Clinical Documentation System · Tooth notation: ${notationLabel}</span>
+        </div>
+      </div>
+      <div class="print-meta">
+        <strong>${dateStr}</strong>
+        Printed at ${timeStr}
+      </div>
+    </div>
+
+    <div class="print-visit-badge">${visitLabel}</div>
+
+    ${sectionsHTML}
+
+    <div style="display:flex;justify-content:flex-end;margin-top:24px;">
+      <div class="print-sig-box">Clinician Signature</div>
+    </div>
+
+    <div class="print-footer">
+      <span>Dr. Mohammed Homam Alsamman — Orthodontic Clinical Records System</span>
+      <span>© ${now.getFullYear()} All Rights Reserved</span>
+    </div>
+    <div class="print-confidential">⚠ Confidential Medical Record — Not for Unauthorized Distribution</div>
+  `;
+}
+
+function printSummary() {
+  const html = buildPrintHTML();
+  if (!html) { showToast('⚠️ Nothing to print yet','error'); return; }
+  const overlay = document.getElementById('print-overlay');
+  const doc     = document.getElementById('print-doc-content');
+  doc.innerHTML = html;
+  overlay.style.display = 'block';
+  setTimeout(() => {
+    window.print();
+    overlay.style.display = 'none';
+  }, 120);
 }
 
 // ── Save / Load / Clear ────────────────────────────────────────────────

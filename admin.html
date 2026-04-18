@@ -502,6 +502,10 @@
                   <input type="radio" name="notation" value="Palmer" id="notation-palmer" onchange="updateNotationStyle()">
                   Palmer <span style="color:var(--grey-400);font-weight:400;">(UR1–LL8)</span>
                 </label>
+                <label class="notation-opt" id="notation-universal-lbl">
+                  <input type="radio" name="notation" value="Universal" id="notation-universal" onchange="updateNotationStyle()">
+                  Universal <span style="color:var(--grey-400);font-weight:400;">(1–32)</span>
+                </label>
               </div>
             </div>
           </div>
@@ -858,12 +862,13 @@ function loadClinicSettings() {
   document.getElementById('default-interval').value= schema.defaultInterval || '';
   document.getElementById('aseptic-statement').value = schema.asepticStatement || '';
   const nota = schema.notation || 'FDI';
-  const el = document.getElementById('notation-' + nota.toLowerCase());
+  const notaKey = nota.toLowerCase();
+  const el = document.getElementById('notation-' + notaKey);
   if (el) { el.checked = true; updateNotationStyle(); }
 }
 
 function updateNotationStyle() {
-  ['fdi','palmer'].forEach(n => {
+  ['fdi','palmer','universal'].forEach(n => {
     const lbl = document.getElementById('notation-'+n+'-lbl');
     const inp = document.getElementById('notation-'+n);
     if (lbl && inp) lbl.classList.toggle('selected', inp.checked);
