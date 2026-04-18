@@ -3315,90 +3315,498 @@ async function copyCurrentSummary() {
 
 // ── Professional Print ─────────────────────────────────────────────────
 const TAB_LABELS = {
-  'exam':       '🔍 Clinical Examination',
-  'plan':       '📝 Treatment Plan',
-  'bond':       '🔗 Bond-Up Visit',
-  'fu-fixed':   '🔩 Fixed Follow-Up',
-  'fu-aligner': '💎 Aligner Follow-Up',
-  'emergency':  '🚨 Emergency Visit',
-  'debond':     '✂️ Debond & Retainer',
+  'exam':       'Clinical Examination',
+  'plan':       'Treatment Plan',
+  'bond':       'Bond-Up Visit',
+  'fu-fixed':   'Fixed Follow-Up',
+  'fu-aligner': 'Aligner Follow-Up',
+  'emergency':  'Emergency Visit',
+  'debond':     'Debond & Retainer',
 };
 
+// Print-specific data collectors — mirrors summary builders exactly,
+// but returns structured { sections:[{title, rows:[{label,value,aseptic,indent}]}] }
+// so HTML rendering is perfect with no text-parsing ambiguity.
+
+function pe(str) {
+  // escape HTML for print
+  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function buildPrintSections() {
+  const sections = [];
+  let sec = null;
+  const S = title => { sec = { title, rows:[] }; sections.push(sec); };
+  const R = (label, value, opts={}) => {
+    if (!value && !opts.always) return;
+    if (value === undefined || value === null || String(value).trim() === '') return;
+    sec.rows.push({ label: String(label), value: String(value), ...opts });
+  };
+  const RA = (value) => { // aseptic special row
+    if (!value) return;
+    sec.rows.push({ label:'', value: String(value), aseptic: true });
+  };
+  const RB = (value) => { // bold/highlight row (no label)
+    if (!String(value||'').trim()) return;
+    sec.rows.push({ label:'', value: String(value), bold: true });
+  };
+
+  switch(currentTab) {
+
+    // ══════════════════════════════════════
+    case 'exam': {
+      S('Patient Information');
+      R('Name', get('patientName'));
+      R('Age', get('age') ? get('age')+' years' : '');
+      R('Sex', radio('sex'));
+
+      const conds=[];
+      if(isChk('mhx-nil'))conds.push('NAD');if(isChk('mhx-dm'))conds.push('Diabetes Mellitus');
+      if(isChk('mhx-htn'))conds.push('Hypertension');if(isChk('mhx-thyroid'))conds.push('Thyroid Disorder');
+      if(isChk('mhx-asthma'))conds.push('Asthma');if(isChk('mhx-cardiac'))conds.push('Cardiac Condition');
+      if(isChk('mhx-cleft'))conds.push('Cleft Lip/Palate');if(isChk('mhx-growth'))conds.push('Growth Disorder');
+      if(isChk('mhx-other'))conds.push('Other (see notes)');
+      S('Medical History');
+      R('Medical Hx', conds.length ? conds.join(', ') : 'NAD');
+      R('Medications', get('medications')); R('Allergies', get('allergies'));
+      R('Previous orthodontic treatment', get('prevOrtho')); R('Notes', get('mhxNotes'));
+
+      const ccItems = chkList('cc');
+      S('Chief Complaint');
+      R('Chief complaint', ccItems.length ? ccItems.join(', ') : '');
+      R('Description', get('ccFree')); R('Motivation', radio('motivation'));
+
+      S('Facial Analysis');
+      const prof=radio('profile'), vert=radio('vertPattern');
+      if(prof||vert) R('Profile', [prof, vert?'with '+vert+' pattern':''].filter(Boolean).join(' '));
+      R('Symmetry', radio('facialSym'));
+
+      S('Smile & Lips');
+      R('Smile arc', radio('smileArc')); R('Gingival display', radio('gingiDisplay'));
+      R('Buccal corridors', radio('buccalCorridor')); R('Lip competence', radio('lipComp'));
+      R('Lip position — Upper', radio('lipUpper')); R('Lip position — Lower', radio('lipLower'));
+      R('Nasolabial angle', radio('nasoAngle'));
+
+      S('Dental Classification');
+      R('Incisors', radio('incisorClass'));
+      const br=radio('buccalRight'), bl=radio('buccalLeft');
+      if(br||bl) R('Buccal relation', `Right: ${br||'—'}   |   Left: ${bl||'—'}`);
+
+      S('Crowding & Spacing');
+      const cU=radio('crowding-upper'),cL=radio('crowding-lower');
+      const sU=radio('spacing-upper'),sL=radio('spacing-lower');
+      if(cU||cL) R('Crowding', [cU?`Upper: ${cU}`:'', cL?`Lower: ${cL}`:''].filter(Boolean).join('   |   '));
+      if(sU||sL) R('Spacing',  [sU?`Upper: ${sU}`:'', sL?`Lower: ${sL}`:''].filter(Boolean).join('   |   '));
+
+      S('Key Measurements');
+      const ojVal=radio('oj'),ojN=get('ojNote');
+      R('Overjet (OJ)', ojVal?(ojN?`${ojVal} (${ojN} mm)`:ojVal):'');
+      const obVal=radio('ob'),obN=get('obNote');
+      R('Overbite (OB)', obVal?(obN?`${obVal} (${obN} mm)`:obVal):'');
+      R('Curve of Spee', radio('cos'));
+      const txVal=get('transverse'),txN=get('transverseNote');
+      R('Transverse', txVal?(txN?`${txVal} (${txN})`:txVal):'');
+      const uM=radio('upperMid'),uN=get('upperMidNote');
+      const lM=radio('lowerMid'),lN=get('lowerMidNote');
+      R('Upper midline', uM?[uM,uN?uN+' mm':''].filter(Boolean).join(', '):'');
+      R('Lower midline', lM?[lM,lN?lN+' mm':''].filter(Boolean).join(', '):'');
+
+      // Dental chart
+      const gC={carious:[],rcted:[],missing:[],restored:[]};
+      [...upperTeeth,...lowerTeeth].forEach(n=>{const st=toothStates[toothState[n]];if(st!=='normal')gC[st].push(toothLabel(n));});
+      const hasChart=Object.values(gC).some(a=>a.length)||get('chartNotes');
+      if(hasChart){
+        S('Dental Chart');
+        if(gC.carious.length)  R('Carious teeth', gC.carious.join(', '));
+        if(gC.rcted.length)    R('RCTed teeth', gC.rcted.join(', '));
+        if(gC.missing.length)  R('Missing teeth', gC.missing.join(', '));
+        if(gC.restored.length) R('Restored / Crowned', gC.restored.join(', '));
+        R('Notes', get('chartNotes'));
+      }
+
+      S('Periodontal & Soft Tissue');
+      R('Gingival biotype', radio('ginBiotype')); R('Oral hygiene', radio('oralHygiene'));
+      R('Gingival health', radio('ginHealth'));
+      const tSize=radio('tongueSize'),tScal=radio('tongueScallop');
+      R('Tongue', [tSize,tScal].filter(Boolean).join(', '));
+      const fren=[];
+      if(isChk('frenal-upper'))fren.push('High upper labial frenum');
+      if(isChk('frenal-lower'))fren.push('Low lower labial frenum');
+      if(isChk('frenal-lingual'))fren.push('Tongue tie');
+      if(fren.length) R('Frenal attachments', fren.join(', '));
+      R('Perio notes', get('perioNotes'));
+
+      const hab=[];
+      if(isChk('habit-nil'))hab.push('None identified');if(isChk('habit-thumbsuck'))hab.push('Thumb sucking');
+      if(isChk('habit-dummy'))hab.push('Dummy use');if(isChk('habit-nailbite'))hab.push('Nail biting');
+      if(isChk('habit-liplick'))hab.push('Lip licking');if(isChk('habit-mouthbreathe'))hab.push('Mouth breathing');
+      if(isChk('habit-tongue'))hab.push('Tongue thrusting');if(isChk('habit-brux'))hab.push('Bruxism');
+      if(isChk('habit-pencil'))hab.push('Pencil biting');
+      if(hab.length||get('habitNotes')){
+        S('Habits');
+        if(hab.length) R('Habits', hab.join(', '));
+        R('Notes', get('habitNotes'));
+      }
+
+      S('Radiographic Findings — OPG');
+      R('Bone level', radio('boneLevel')); R('Condylar morphology', radio('condylar'));
+      R('Root morphology', radio('rootMorph'));
+      const ws=[];
+      if(isChk('wis-18'))ws.push('18');if(isChk('wis-28'))ws.push('28');
+      if(isChk('wis-38'))ws.push('38');if(isChk('wis-48'))ws.push('48');
+      if(ws.length) R('Third molars present', ws.join(', '));
+      R('Unerupted / Impacted', get('unerupted')); R('OPG notes', get('radioNotes'));
+
+      const recs=[];
+      if(isChk('rec-photos'))recs.push('Clinical photographs');if(isChk('rec-opg'))recs.push('OPG');
+      if(isChk('rec-ceph'))recs.push('Lateral cephalogram');if(isChk('rec-iopa'))recs.push('IOPA');
+      if(isChk('rec-cbct'))recs.push('CBCT');if(isChk('rec-models'))recs.push('Study models');
+      if(isChk('rec-scan'))recs.push('Intraoral scan');if(isChk('rec-consent'))recs.push('Consent signed');
+      if(isChk('rec-video'))recs.push('Intraoral video');
+      if(recs.length||isChk('aseptic-confirm')){
+        S('Records & Aseptic');
+        if(recs.length) R('Records taken', recs.join(', '));
+        if(isChk('aseptic-confirm')) RA('Aseptic technique and appropriate PPE were maintained and observed throughout the entire procedure. Confirmed by Clinician.');
+      }
+
+      S('Assessment & Plan');
+      R('Diagnosis', get('diagnosis')); R('Referral', get('referral'));
+      R('Next visit purpose', get('nextVisitPurpose'));
+      R('Cost', get('cost')?'SAR '+get('cost'):''); R('Notes', get('addNotes'));
+      break;
+    }
+
+    // ══════════════════════════════════════
+    case 'plan': {
+      S('Treatment Plan');
+      R('Patient', get('plan-name')); R('Age', get('plan-age')?get('plan-age')+' years':'');
+      R('Clinician', get('plan-clinician')); R('Date', get('plan-date'));
+      const appType=document.querySelector('[name="plan-appliance-type"]:checked')?.value||'';
+      S('Appliance & Prescription');
+      if(appType==='fixed'){
+        R('Treatment type', get('plan-tx-type')); R('Slot', radio('plan-slot'));
+        R('Prescription', radio('plan-rx')); R('Brand', radio('plan-brand'));
+        R('Arch coverage', radio('plan-arch-cov')); R('Bracket modification', get('plan-bracket-mod'));
+      } else if(appType==='aligner'){
+        R('System', get('plan-aligner-brand')); R('Scope', radio('plan-aligner-scope'));
+        R('Est. aligners', get('plan-aligner-count'));
+      }
+      S('Anchorage & Extractions');
+      R('Anchorage requirement', radio('plan-anch'));
+      const ar=[];
+      if(isChk('plan-anch-tad'))ar.push('TADs');if(isChk('plan-anch-hg'))ar.push('Headgear');
+      if(isChk('plan-anch-tpa'))ar.push('TPA/Nance');if(isChk('plan-anch-elastic'))ar.push('Elastics');
+      if(ar.length) R('Anchorage reinforcement', ar.join(', '));
+      R('Extractions', radio('plan-ext')); R('Notes', get('plan-ext-notes'));
+      S('Treatment Stages');
+      R('Alignment & leveling', get('plan-stage1')); R('OJ/OB correction', get('plan-stage2'));
+      R('Finishing', get('plan-stage3')); R('Retention', get('plan-stage4'));
+      R('Estimated duration', get('plan-duration'));
+      S('Clinical Considerations');
+      const hab2=[];
+      if(isChk('plan-habit-thumb'))hab2.push('Thumb sucking');if(isChk('plan-habit-mouth'))hab2.push('Mouth breathing');
+      if(isChk('plan-habit-tongue'))hab2.push('Tongue thrusting');if(isChk('plan-habit-brux'))hab2.push('Bruxism');
+      if(isChk('plan-habit-none'))hab2.push('None');
+      if(hab2.length) R('Habits to address', hab2.join(', '));
+      R('Midline', radio('plan-midline')); R('Lip prominence', radio('plan-lip-prom'));
+      R('Facial symmetry goal', radio('plan-sym')); R('Smile line', radio('plan-smile'));
+      R('Referrals', get('plan-referral')); R('Plan details', get('plan-details'));
+      S('Financial Plan');
+      R('Total cost', get('plan-cost-total')?'SAR '+get('plan-cost-total'):'');
+      R('First payment', get('plan-cost-first')?'SAR '+get('plan-cost-first'):'');
+      R('Monthly payment', get('plan-cost-monthly')?'SAR '+get('plan-cost-monthly'):'');
+      R('Payment notes', get('plan-cost-notes'));
+      break;
+    }
+
+    // ══════════════════════════════════════
+    case 'bond': {
+      S('Bond-Up Visit');
+      R('Patient', get('bond-name')); R('Visit #', get('bond-visit-no'));
+      R('Date', get('bond-date')); R('Clinician', get('bond-clinician'));
+      const bondType=document.querySelector('[name="bond-type"]:checked')?.value||'';
+      if(bondType==='fixed'){
+        S('Fixed Appliance Bonding');
+        const sumTxt=document.getElementById('bond-fixed-summary')?.textContent||'';
+        if(sumTxt) RB(sumTxt);
+        const uw=getWireText('bond-wire-selector','upper'),lw=getWireText('bond-wire-selector','lower');
+        R('Upper archwire', uw); R('Lower archwire', lw);
+        const ax=[];
+        if(isChk('bond-aux-spring'))ax.push('Open coil spring');if(isChk('bond-aux-chain'))ax.push('Elastic chain');
+        if(isChk('bond-aux-bite-ramp'))ax.push('Bite ramps');if(isChk('bond-aux-lace'))ax.push('Lacebacks');
+        if(isChk('bond-aux-piggyback'))ax.push('Piggyback wire');
+        if(ax.length) R('Auxiliaries', ax.join(', '));
+        R('Bracket notes', get('bond-bracket-notes'));
+      } else if(bondType==='aligner'){
+        S('Aligner Start Session');
+        R('Total aligners', get('bond-total-aligners')); R('Aligners given', get('bond-aligners-given'));
+        R('Wear protocol', radio('bond-aligner-wear')); R('Attachments', get('bond-attachments'));
+        R('Buttons', get('bond-buttons')); R('IPR', radio('bond-ipr')); R('IPR details', get('bond-ipr-notes'));
+      }
+      S('Elastics & Instructions');
+      const elCfgB=radio('bond-elastic-config');
+      if(elCfgB==='asymmetric'){
+        const elR=[radio('bond-elastic-r'),radio('bond-el-size-r'),radio('bond-el-force-r')].filter(Boolean).join(' — ');
+        const elL=[radio('bond-elastic-l'),radio('bond-el-size-l'),radio('bond-el-force-l')].filter(Boolean).join(' — ');
+        R('Elastics — Right', elR); R('Elastics — Left', elL);
+      } else {
+        R('Elastics', elasticText('bond-elastic','bond-el-size','bond-el-force'));
+      }
+      R('Elastic notes', get('bond-elastic-notes'));
+      if(isChk('bond-elastic-inst')) R('Elastic instructions', 'Proper use and timing instructed to the patient');
+      R('Oral hygiene', radio('bond-oh'));
+      const inst=[];
+      if(isChk('bond-inst-appliance'))inst.push('Appliance instructions');if(isChk('bond-inst-elastic'))inst.push('Elastic use');
+      if(isChk('bond-inst-aligner'))inst.push('Aligner instructions');if(isChk('bond-inst-diet'))inst.push('Dietary restrictions');
+      if(inst.length) R('Instructions given', inst.join(', '));
+      R('Next visit', get('bond-nv')); R('Referral', get('bond-referral'));
+      if(isChk('bond-aseptic')) RA('Aseptic technique and appropriate PPE were maintained and observed throughout the entire procedure. Confirmed by Clinician.');
+      R('Notes', get('bond-notes'));
+      break;
+    }
+
+    // ══════════════════════════════════════
+    case 'fu-fixed': {
+      S('Fixed Follow-Up Visit');
+      R('Patient', get('fuf-name')); R('Visit #', get('fuf-visit-no'));
+      R('Date', get('fuf-date')); R('Clinician', get('fuf-clinician'));
+
+      // Bond/rebond
+      const rb=[];
+      if(isChk('fuf-rebond-bracket'))rb.push('Bond bracket');if(isChk('fuf-rebond-rebond'))rb.push('Re-bond bracket');
+      if(isChk('fuf-rebond-replace-bracket'))rb.push('Replace bracket');if(isChk('fuf-rebond-tube'))rb.push('Bond molar tube');
+      if(isChk('fuf-rebond-retube'))rb.push('Re-bond molar tube');if(isChk('fuf-rebond-replace-tube'))rb.push('Replace molar tube');
+      if(isChk('fuf-rebond-button'))rb.push('Bond button');if(isChk('fuf-rebond-rebutton'))rb.push('Re-bond button');
+      if(isChk('fuf-rebond-replace-button'))rb.push('Replace button');
+      if(rb.length){
+        S('Bond / Re-bond / Replace');
+        rebondActions.filter(a=>isChk(a)).forEach(a=>{
+          const teeth=[...rebondChartSets[a]].sort((x,y)=>x-y).map(n=>toothLabel(n)).join(', ');
+          RB(teeth ? `${rebondLabels[a]} on ${teeth}` : rebondLabels[a]);
+        });
+        R('Reason for failure', radio('fuf-rebond-reason'));
+        R('Notes', get('fuf-rebond-notes'));
+      }
+
+      S('Archwires');
+      const uw=getWireText('fuf-wire-selector','upper'),lw=getWireText('fuf-wire-selector','lower');
+
+      // Upper group
+      const upperLines=[];
+      if(uw) upperLines.push('Archwire: '+uw);
+      if(isChk('fuf-aux-wire-upper-en')){const auw=getWireText('fuf-aux-wire-upper','upper');if(auw)upperLines.push('Auxiliary: '+auw);}
+      if(get('fuf-wire-notes-upper')) upperLines.push('Notes: '+get('fuf-wire-notes-upper'));
+      const ligU=[];const rU=radio('fuf-lig-upper');if(rU)ligU.push(rU);
+      if(isChk('fuf-lig-upper-short')){const t=[...ligSelectedTeeth.upper.short].sort((a,b)=>a-b).map(n=>toothLabel(n)).join(', ');ligU.push('Short ligature'+(t?' on '+t:''));}
+      if(isChk('fuf-lig-upper-fig8')){const t=[...ligSelectedTeeth.upper.fig8].sort((a,b)=>a-b).map(n=>toothLabel(n)).join(', ');ligU.push('Figure of 8'+(t?' on '+t:''));}
+      if(ligU.length) upperLines.push('Ligature: '+ligU.join(', '));
+      if(upperLines.length) R('Upper', upperLines.join(' · '));
+
+      // Lower group
+      const lowerLines=[];
+      if(lw) lowerLines.push('Archwire: '+lw);
+      if(isChk('fuf-aux-wire-lower-en')){const alw=getWireText('fuf-aux-wire-lower','lower');if(alw)lowerLines.push('Auxiliary: '+alw);}
+      if(get('fuf-wire-notes-lower')) lowerLines.push('Notes: '+get('fuf-wire-notes-lower'));
+      const ligL=[];const rL=radio('fuf-lig-lower');if(rL)ligL.push(rL);
+      if(isChk('fuf-lig-lower-short')){const t=[...ligSelectedTeeth.lower.short].sort((a,b)=>a-b).map(n=>toothLabel(n)).join(', ');ligL.push('Short ligature'+(t?' on '+t:''));}
+      if(isChk('fuf-lig-lower-fig8')){const t=[...ligSelectedTeeth.lower.fig8].sort((a,b)=>a-b).map(n=>toothLabel(n)).join(', ');ligL.push('Figure of 8'+(t?' on '+t:''));}
+      if(ligL.length) lowerLines.push('Ligature: '+ligL.join(', '));
+      if(lowerLines.length) R('Lower', lowerLines.join(' · '));
+
+      S('Active Mechanics');
+      R('Treatment stage', radio('fuf-stage'));
+      const ax2=[];
+      if(isChk('fuf-aux-chain'))ax2.push('Elastic chain');if(isChk('fuf-aux-spring'))ax2.push('Open coil spring');
+      if(isChk('fuf-aux-tad'))ax2.push('TAD force');if(isChk('fuf-aux-powerarm'))ax2.push('Power arm');
+      if(isChk('fuf-aux-tpa'))ax2.push('TPA/Nance');if(isChk('fuf-aux-bite-plate'))ax2.push('Bite plate');
+      if(ax2.length) R('Auxiliaries', ax2.join(', '));
+      const elCfg=radio('fuf-elastic-config');
+      if(elCfg==='asymmetric'){
+        const elR=[radio('fuf-elastic-r'),radio('fuf-el-size-r'),radio('fuf-el-force-r')].filter(Boolean).join(' — ');
+        const elL=[radio('fuf-elastic-l'),radio('fuf-el-size-l'),radio('fuf-el-force-l')].filter(Boolean).join(' — ');
+        R('Elastics — Right', elR); R('Elastics — Left', elL);
+      } else {
+        R('Elastics', elasticText('fuf-elastic','fuf-el-size','fuf-el-force'));
+      }
+      R('Elastic notes', get('fuf-elastic-notes'));
+      if(isChk('fuf-elastic-inst')) R('Elastic instructions', 'Proper use and timing instructed to the patient');
+      R('Mechanics notes', get('fuf-mech-notes'));
+
+      S('Progress Assessment');
+      R('Alignment progress', radio('fuf-align-prog')); R('Patient compliance', radio('fuf-compliance'));
+      R('Oral hygiene', radio('fuf-oh'));
+
+      S('Visit Completion');
+      R('Next visit', get('fuf-nv')); R('Referral', get('fuf-referral'));
+      if(isChk('fuf-aseptic')) RA('Aseptic technique and appropriate PPE were maintained and observed throughout the entire procedure. Confirmed by Clinician.');
+      R('Notes', get('fuf-notes'));
+      break;
+    }
+
+    // ══════════════════════════════════════
+    case 'fu-aligner': {
+      S('Aligner Follow-Up Visit');
+      R('Patient', get('fua-name')); R('Visit #', get('fua-visit-no'));
+      R('Date', get('fua-date')); R('Clinician', get('fua-clinician'));
+      S('Aligner Progress');
+      const cur=get('fua-current-aligner'),tot=get('fua-total-aligners');
+      if(cur||tot) R('Current aligner', `#${cur} of ${tot}`);
+      const pct=tot?Math.min(100,Math.round((parseInt(cur)||0)/(parseInt(tot)||1)*100)):0;
+      if(cur&&tot) R('Progress', `${pct}% complete`);
+      R('Aligners given', get('fua-given')); R('Tracking', radio('fua-tracking'));
+      R('Non-tracking teeth', get('fua-nontrack'));
+      S('Procedures This Visit');
+      R('IPR', radio('fua-ipr')); R('IPR details', get('fua-ipr-detail'));
+      const att=[];
+      if(isChk('fua-att-add'))att.push('Added');if(isChk('fua-att-remove'))att.push('Removed');
+      if(isChk('fua-att-replace'))att.push('Replaced');if(isChk('fua-att-none'))att.push('No change');
+      if(att.length) R('Attachments', att.join(', '));
+      R('Attachment details', get('fua-att-notes'));
+      const btn2=[];
+      if(isChk('fua-btn-add'))btn2.push('Added');if(isChk('fua-btn-remove'))btn2.push('Removed');if(isChk('fua-btn-none'))btn2.push('No change');
+      if(btn2.length) R('Buttons', btn2.join(', '));
+      R('Button details', get('fua-btn-notes'));
+      const elCfgA=radio('fua-elastic-config');
+      if(elCfgA==='asymmetric'){
+        const elR=[radio('fua-elastic-r'),radio('fua-el-size-r'),radio('fua-el-force-r')].filter(Boolean).join(' — ');
+        const elL=[radio('fua-elastic-l'),radio('fua-el-size-l'),radio('fua-el-force-l')].filter(Boolean).join(' — ');
+        R('Elastics — Right', elR); R('Elastics — Left', elL);
+      } else {
+        R('Elastics', elasticText('fua-elastic','fua-el-size','fua-el-force'));
+      }
+      R('Elastic notes', get('fua-elastic-notes'));
+      if(isChk('fua-elastic-inst')) R('Elastic instructions', 'Proper use and timing instructed to the patient');
+      S('Visit Completion');
+      R('Oral hygiene', radio('fua-oh')); R('Wear compliance', radio('fua-wear-comply'));
+      R('Next visit', get('fua-nv')); R('Referral', get('fua-referral'));
+      if(isChk('fua-aseptic')) RA('Aseptic technique and appropriate PPE were maintained and observed throughout the entire procedure. Confirmed by Clinician.');
+      R('Notes', get('fua-notes'));
+      break;
+    }
+
+    // ══════════════════════════════════════
+    case 'emergency': {
+      S('Emergency Visit');
+      R('Patient', get('em-name'));
+      R('Pain level', get('em-pain')?get('em-pain')+'/10':'');
+      R('Date', get('em-date')); R('Clinician', get('em-clinician'));
+      S('Chief Complaint');
+      const emTypes=[...activeEmPills].map(val=>{
+        const chartKey=val.replace(/[^a-z0-9]/gi,'-').toLowerCase();
+        const teethSet=emChartSets[val];
+        const teeth=teethSet?[...teethSet].sort((a,b)=>a-b).map(n=>toothLabel(n)).join(', '):'';
+        return teeth?`${val} (${teeth})`:val;
+      }).join('; ');
+      R('Emergency type', emTypes);
+      R('Tooth / Location', get('em-tooth'));
+      R('Duration of problem', radio('em-duration'));
+      S('Treatment Performed');
+      const tx=[];
+      if(isChk('em-tx-rebond-bracket'))tx.push('Re-bond bracket');if(isChk('em-tx-rebond-tube'))tx.push('Re-bond molar tube');
+      if(isChk('em-tx-rebond-retainer'))tx.push('Re-bond retainer');if(isChk('em-tx-cut-wire'))tx.push('Cut/trim excess wire');
+      if(isChk('em-tx-replace-wire'))tx.push('Replace archwire');if(isChk('em-tx-remove-appliance'))tx.push('Remove loose appliance');
+      if(isChk('em-tx-wax'))tx.push('Place wax');if(isChk('em-tx-rebond-chain'))tx.push('Replace elastic chain');
+      if(isChk('em-tx-new-aligner'))tx.push('Issue replacement aligner');if(isChk('em-tx-analgesia'))tx.push('Analgesia advised');
+      if(tx.length) R('Actions taken', tx.join(', '));
+      const ew=getWireText('em-wire-selector','upper')||getWireText('em-wire-selector','lower');
+      if(ew) R('Replacement wire', ew+' — '+(radio('em-wire-arch')||''));
+      R('Description', get('em-tx-desc'));
+      S('Completion & Follow-Up');
+      const inst2=[];
+      if(isChk('em-inst-wax'))inst2.push('Wax use');if(isChk('em-inst-diet'))inst2.push('Soft diet');
+      if(isChk('em-inst-analgesic'))inst2.push('OTC analgesic');if(isChk('em-inst-callback'))inst2.push('Call if worsens');
+      if(inst2.length) R('Instructions given', inst2.join(', '));
+      R('Follow-up plan', radio('em-return'));
+      if(isChk('em-aseptic')) RA('Aseptic technique and appropriate PPE were maintained and observed throughout the entire procedure. Confirmed by Clinician.');
+      R('Notes', get('em-notes')); R('Referral', get('em-referral'));
+      break;
+    }
+
+    // ══════════════════════════════════════
+    case 'debond': {
+      S('Debond & Retainer Visit');
+      R('Patient', get('db-name')); R('Total treatment duration', get('db-duration'));
+      R('Date', get('db-date')); R('Clinician', get('db-clinician'));
+      S('Debonding Procedure');
+      const rem=[];
+      if(isChk('db-remove-full'))rem.push('Upper and lower fixed appliance de-bonded');
+      if(isChk('db-remove-upper'))rem.push('Upper fixed appliance de-bonded');
+      if(isChk('db-remove-lower'))rem.push('Lower fixed appliance de-bonded');
+      if(isChk('db-remove-aligner'))rem.push('Final aligner — clear aligner treatment complete');
+      rem.forEach(r=>RB(r));
+      const cm=[];
+      if(isChk('db-bur-round'))cm.push('Large round low-speed bur');if(isChk('db-bur-fg'))cm.push('FG bur');
+      if(isChk('db-polishing'))cm.push('Polishing discs/pumice');if(isChk('db-scaler'))cm.push('Ultrasonic scaler');
+      if(cm.length) R('Composite removal', cm.join(', '));
+      R('Enamel condition', radio('db-enamel'));
+      const imp=[];
+      if(isChk('db-imp-alginate'))imp.push('Upper & lower alginate impressions');
+      if(isChk('db-imp-scan'))imp.push('Intraoral scan');
+      if(isChk('db-imp-upper'))imp.push('Upper impression');if(isChk('db-imp-lower'))imp.push('Lower impression');
+      if(imp.length) R('Impressions taken', imp.join(', ')+(get('db-imp-purpose')?' — '+get('db-imp-purpose'):''));
+      S('Retainers');
+      R('Fixed retainer — Upper', radio('db-fr-upper')); R('Fixed retainer — Lower', radio('db-fr-lower'));
+      const rr=[];
+      if(isChk('db-rr-vfr'))rr.push('Vacuum-formed (VFR)');if(isChk('db-rr-hawley'))rr.push('Hawley');
+      if(isChk('db-rr-spring'))rr.push('Spring retainer');if(isChk('db-rr-none'))rr.push('None at this visit');
+      if(rr.length) R('Removable retainer', rr.join(', '));
+      R('Removable retainer arch', radio('db-rr-arch')); R('Wear protocol', radio('db-rr-wear'));
+      R('Retainer notes', get('db-retainer-notes'));
+      S('Outcome & Discharge');
+      R('Treatment objectives', radio('db-outcome')); R('Oral hygiene', radio('db-oh'));
+      const di=[];
+      if(isChk('db-inst-retainer'))di.push('Retainer wear instructions');if(isChk('db-inst-hygiene'))di.push('Oral hygiene');
+      if(isChk('db-inst-emergency'))di.push('Emergency contacts');if(isChk('db-inst-review'))di.push('Annual retention review');
+      if(di.length) R('Instructions given', di.join(', '));
+      R('Next visit', get('db-nv')); R('Referral', get('db-referral'));
+      if(isChk('db-aseptic')) RA('Aseptic technique and appropriate PPE were maintained and observed throughout the entire procedure. Confirmed by Clinician.');
+      R('Treatment summary', get('db-notes'));
+      break;
+    }
+  }
+
+  return sections.filter(s => s.rows.length > 0);
+}
+
 function buildPrintHTML() {
-  const rawText = getCurrentSummary();
-  if (!rawText || rawText.length < 10) return null;
+  const sections = buildPrintSections();
+  if (!sections || !sections.length) return null;
 
   const now = new Date();
   const dateStr = now.toLocaleDateString('en-GB', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
   const timeStr = now.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
   const visitLabel = TAB_LABELS[currentTab] || currentTab;
   const notationLabel = NOTATION === 'Universal' ? 'Universal (ADA)' : NOTATION;
-
-  // Parse the raw summary text into sections and rows
-  const lines = rawText.split('\n');
-  let sections = [];
-  let currentSection = null;
-
-  lines.forEach(line => {
-    const trimmed = line.trim();
-    if (!trimmed) return;
-    if (!trimmed.startsWith('·')) {
-      // Section title
-      currentSection = { title: trimmed, rows: [] };
-      sections.push(currentSection);
-    } else {
-      // Data row
-      const content = trimmed.slice(1).trim();
-      const colonIdx = content.indexOf(':');
-      if (colonIdx > -1) {
-        const label = content.slice(0, colonIdx).trim();
-        const value = content.slice(colonIdx + 1).trim();
-        if (currentSection) currentSection.rows.push({ label, value });
-      } else {
-        if (currentSection) currentSection.rows.push({ label: '', value: content });
-      }
-    }
-  });
-
-  // Build HTML sections
-  let sectionsHTML = '';
-  sections.forEach(sec => {
-    if (!sec.rows.length) return;
-    let rowsHTML = sec.rows.map(r => `
-      <div class="print-row">
-        <span class="print-label">${r.label ? r.label + ':' : ''}</span>
-        <span class="print-value ${r.label === '' ? 'highlight' : ''}">${r.value}</span>
-      </div>`).join('');
-
-    // Special: aseptic row gets green styling
-    if (sec.rows.some(r => r.label.toLowerCase().includes('aseptic'))) {
-      rowsHTML = sec.rows.map(r => {
-        if (r.label.toLowerCase().includes('aseptic') && r.value) {
-          return `<div class="print-aseptic">🛡️ <span>Aseptic technique and appropriate PPE were maintained and observed throughout the entire procedure. <strong>Confirmed by Clinician.</strong></span></div>`;
-        }
-        return `<div class="print-row"><span class="print-label">${r.label ? r.label + ':' : ''}</span><span class="print-value">${r.value}</span></div>`;
-      }).join('');
-    }
-
-    sectionsHTML += `
-      <div class="print-section">
-        <div class="print-section-title">${sec.title}</div>
-        ${rowsHTML}
-      </div>`;
-  });
-
-  // Get clinic name if set
   const clinicEl = document.getElementById('clinic-name-display');
   const clinicName = (clinicEl && clinicEl.textContent !== 'Integrated Visit & Examination System')
     ? clinicEl.textContent : 'Orthodontic Clinical Records';
+
+  let sectionsHTML = sections.map(sec => {
+    const rowsHTML = sec.rows.map(r => {
+      if (r.aseptic) {
+        return `<div class="print-aseptic">🛡️ <span>${pe(r.value)}</span></div>`;
+      }
+      if (r.bold) {
+        return `<div class="print-row"><span class="print-label"></span><span class="print-value" style="font-weight:600;color:#0d1b2a;">${pe(r.value)}</span></div>`;
+      }
+      return `<div class="print-row">
+        <span class="print-label">${r.label ? pe(r.label)+':' : ''}</span>
+        <span class="print-value">${pe(r.value)}</span>
+      </div>`;
+    }).join('');
+    return `<div class="print-section">
+      <div class="print-section-title">${pe(sec.title)}</div>
+      ${rowsHTML}
+    </div>`;
+  }).join('');
 
   return `
     <div class="print-header">
       <div class="print-logo">
         <div class="print-logo-icon">🦷</div>
         <div class="print-logo-text">
-          <span class="print-logo-title">${clinicName}</span>
-          <span class="print-logo-sub">Clinical Documentation System · Tooth notation: ${notationLabel}</span>
+          <span class="print-logo-title">${pe(clinicName)}</span>
+          <span class="print-logo-sub">Clinical Documentation · Notation: ${notationLabel}</span>
         </div>
       </div>
       <div class="print-meta">
@@ -3406,15 +3814,11 @@ function buildPrintHTML() {
         Printed at ${timeStr}
       </div>
     </div>
-
     <div class="print-visit-badge">${visitLabel}</div>
-
     ${sectionsHTML}
-
     <div style="display:flex;justify-content:flex-end;margin-top:24px;">
       <div class="print-sig-box">Clinician Signature</div>
     </div>
-
     <div class="print-footer">
       <span>Dr. Mohammed Homam Alsamman — Orthodontic Clinical Records System</span>
       <span>© ${now.getFullYear()} All Rights Reserved</span>
@@ -3433,7 +3837,7 @@ function printSummary() {
   setTimeout(() => {
     window.print();
     overlay.style.display = 'none';
-  }, 120);
+  }, 150);
 }
 
 // ── Save / Load / Clear ────────────────────────────────────────────────
