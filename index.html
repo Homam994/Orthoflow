@@ -344,6 +344,38 @@
   .toast.success { background: #1a5c3a; }
   .toast.error   { background: #a02820; }
 
+  /* ── Autosave indicator (bottom-left) ── */
+  .autosave-indicator {
+    position: fixed; bottom: 66px; left: 18px;
+    display: flex; align-items: center; gap: 7px;
+    background: rgba(13,27,42,0.82); backdrop-filter: blur(8px);
+    color: rgba(255,255,255,0.55); padding: 6px 12px;
+    border-radius: 20px; font-size: 0.74rem; font-weight: 500;
+    z-index: 9998; opacity: 0; transition: opacity 0.35s;
+    pointer-events: none;
+  }
+  .autosave-indicator.visible { opacity: 1; }
+  .autosave-indicator.saving  { color: var(--teal-mid); }
+  .autosave-indicator.saved   { color: #81c784; }
+  .autosave-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: currentColor; flex-shrink: 0;
+  }
+  .autosave-indicator.saving .autosave-dot {
+    animation: as-pulse 0.8s ease-in-out infinite;
+  }
+  @keyframes as-pulse {
+    0%,100% { opacity:1; transform:scale(1);   }
+    50%      { opacity:.3; transform:scale(.65); }
+  }
+
+  /* ── Unsaved-changes dot on tab button ── */
+  .tab-btn .unsaved-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--gold); flex-shrink: 0; display: none;
+  }
+  .tab-btn.has-unsaved .unsaved-dot { display: inline-block; }
+
   /* ── Actions Bar ── */
   .actions {
     position: sticky; bottom: 0;
@@ -533,31 +565,38 @@
 <div class="tab-nav-wrap">
   <nav class="tab-nav">
     <button class="tab-btn active" onclick="switchTab('exam')" id="tbtn-exam">
-      <span class="tab-icon">🔍</span> Examination
+      <span class="tab-icon">🔍</span> Examination<span class="unsaved-dot"></span>
     </button>
     <button class="tab-btn" onclick="switchTab('plan')" id="tbtn-plan">
-      <span class="tab-icon">📝</span> Treatment Plan
+      <span class="tab-icon">📝</span> Treatment Plan<span class="unsaved-dot"></span>
     </button>
     <button class="tab-btn" onclick="switchTab('bond')" id="tbtn-bond">
-      <span class="tab-icon">🔗</span> Bond-Up
+      <span class="tab-icon">🔗</span> Bond-Up<span class="unsaved-dot"></span>
     </button>
     <button class="tab-btn" onclick="switchTab('fu-fixed')" id="tbtn-fu-fixed">
-      <span class="tab-icon">🔩</span> Fixed Follow-Up
+      <span class="tab-icon">🔩</span> Fixed Follow-Up<span class="unsaved-dot"></span>
     </button>
     <button class="tab-btn" onclick="switchTab('fu-aligner')" id="tbtn-fu-aligner">
-      <span class="tab-icon">💎</span> Aligner Follow-Up
+      <span class="tab-icon">💎</span> Aligner Follow-Up<span class="unsaved-dot"></span>
     </button>
     <button class="tab-btn" onclick="switchTab('emergency')" id="tbtn-emergency">
-      <span class="tab-icon">🚨</span> Emergency
+      <span class="tab-icon">🚨</span> Emergency<span class="unsaved-dot"></span>
     </button>
     <button class="tab-btn" onclick="switchTab('debond')" id="tbtn-debond">
-      <span class="tab-icon">✂️</span> Debond & Retainer
+      <span class="tab-icon">✂️</span> Debond &amp; Retainer<span class="unsaved-dot"></span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('tad')" id="tbtn-tad">
+      <span class="tab-icon">🔩</span> TAD / Mini-screw<span class="unsaved-dot"></span>
     </button>
   </nav>
 </div>
 
 <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>
 <div class="toast" id="toast"></div>
+<div class="autosave-indicator" id="autosave-indicator">
+  <div class="autosave-dot"></div>
+  <span id="autosave-text">جاري الحفظ...</span>
+</div>
 
 <div class="container">
 
@@ -2588,6 +2627,49 @@
   </div>
 </div><!-- /panel-debond -->
 
+
+<!-- ═══════════════════════════════════════════════
+     TAB 8: TAD / MINI-SCREW
+═══════════════════════════════════════════════ -->
+<div class="tab-panel" id="panel-tad">
+  <div class="patient-bar">
+    <div class="field"><label>Patient Name</label><input type="text" id="tad-name" placeholder="Full name"></div>
+    <div class="field"><label>Visit #</label><input type="number" id="tad-visit-no" placeholder="e.g. 1" min="1"></div>
+    <div class="field"><label>Clinician</label><input type="text" id="tad-clinician" placeholder="Dr. ..."></div>
+    <div class="visit-date-box"><label>Date</label><input type="date" id="tad-date"></div>
+  </div>
+
+  <!-- Screw counter bar -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;background:var(--navy);border-radius:10px;padding:10px 16px;">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <span style="color:var(--teal-mid);font-size:0.78rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;">Mini-screws this session</span>
+      <div id="tad-screw-tabs" style="display:flex;gap:5px;flex-wrap:wrap;"></div>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="tadAddScrew()">＋ Add Screw</button>
+  </div>
+
+  <!-- Dynamic screw cards -->
+  <div id="tad-screws-container"></div>
+
+  <!-- Session-level follow-up -->
+  <div class="section-card" id="tad-sec-session">
+    <div class="section-header" onclick="toggleSection('tad-sec-session')">
+      <div class="section-icon green">📋</div>
+      <div class="section-title">Session Follow-Up</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="grid-2">
+        <div class="field"><label>Next Visit</label><textarea id="tad-nv" placeholder="e.g. 4–6 weeks — force check / progress assessment"></textarea></div>
+        <div class="field"><label>Referral</label><textarea id="tad-referral" placeholder="e.g. Oral surgery if tissue hyperplasia persists..."></textarea></div>
+      </div>
+      <div class="aseptic-row"><input type="checkbox" id="tad-aseptic"><span>🛡️ Aseptic technique and appropriate PPE were maintained and observed throughout the entire procedure. Confirmed by Clinician.</span></div>
+      <div class="field"><label>Overall Session Notes</label><textarea id="tad-notes" class="notes-area" placeholder="Patient's general reaction, post-op instructions given, analgesic prescribed..."></textarea></div>
+    </div>
+  </div>
+
+</div><!-- /panel-tad -->
+
 </div><!-- /container -->
 
 <div class="actions">
@@ -3308,6 +3390,7 @@ function getCurrentSummary() {
     case 'fu-aligner': return buildFuAlignerSummary();
     case 'emergency':  return buildEmergencySummary();
     case 'debond':     return buildDebondSummary();
+    case 'tad':        return buildTadSummary();
     default: return '';
   }
 }
@@ -3346,6 +3429,7 @@ const TAB_LABELS = {
   'fu-aligner': 'Aligner Follow-Up',
   'emergency':  'Emergency Visit',
   'debond':     'Debond & Retainer',
+  'tad':        'TAD / Mini-screw',
 };
 
 // Print-specific data collectors — mirrors summary builders exactly,
@@ -3785,6 +3869,78 @@ function buildPrintSections() {
       R('Next visit', get('db-nv')); R('Referral', get('db-referral'));
       if(isChk('db-aseptic')) RA('Aseptic technique and appropriate PPE were maintained and observed throughout the entire procedure. Confirmed by Clinician.');
       R('Treatment summary', get('db-notes'));
+      break;
+    }
+
+    // ══════════════════════════════════════
+    case 'tad': {
+      S('TAD / Mini-screw Visit');
+      R('Patient', get('tad-name')); R('Visit #', get('tad-visit-no'));
+      R('Date', get('tad-date')); R('Clinician', get('tad-clinician'));
+
+      S('Site of Insertion');
+      const jaw = radio('tad-jaw');
+      R('Jaw', jaw);
+      if (jaw === 'Maxilla') {
+        const site = radio('tad-max-site');
+        R('Site', site);
+        if (site === 'Alveolar Buccal' || site === 'Alveolar Palatal') {
+          const teeth = [...tadMaxTeeth].sort((a,b)=>a-b).map(n=>toothLabel(n));
+          if (teeth.length) R('Between teeth', teeth.join(' & '));
+          R('Side', radio('tad-max-side'));
+        } else if (site === 'Infra-zygomatic crest (IZC)') {
+          R('IZC side', radio('tad-izc-side'));
+          R('Vertical position', radio('tad-izc-vert'));
+        } else {
+          R('Palatal A-P position', radio('tad-palatal-ap'));
+        }
+      } else if (jaw === 'Mandible') {
+        const site = radio('tad-mand-site');
+        R('Site', site);
+        if (site === 'Buccal Alveolar') {
+          const teeth = [...tadMandTeeth].sort((a,b)=>a-b).map(n=>toothLabel(n));
+          if (teeth.length) R('Between teeth', teeth.join(' & '));
+          R('Side', radio('tad-mand-side'));
+        } else {
+          R('Side', radio('tad-mand-other-side'));
+        }
+      }
+      R('Site notes', get('tad-site-notes'));
+
+      S('Screw Specifications');
+      R('Diameter', radio('tad-diameter')); R('Length', radio('tad-length'));
+      R('Head type', radio('tad-head')); R('Brand', radio('tad-brand'));
+      const purposes=[];
+      if(isChk('tad-purpose-anch'))   purposes.push('Anchorage reinforcement');
+      if(isChk('tad-purpose-intr'))   purposes.push('Intrusion');
+      if(isChk('tad-purpose-dist'))   purposes.push('Distalization');
+      if(isChk('tad-purpose-retr'))   purposes.push('En-masse retraction');
+      if(isChk('tad-purpose-molar'))  purposes.push('Molar uprighting');
+      if(isChk('tad-purpose-midline'))purposes.push('Midline correction');
+      if(isChk('tad-purpose-other'))  purposes.push('Other');
+      if(purposes.length) R('Purpose', purposes.join(', '));
+
+      S('Clinical Procedure');
+      R('Anaesthesia', radio('tad-anaes')); R('Pilot hole', radio('tad-pilot'));
+      R('Insertion torque', radio('tad-torque')); R('Primary stability', radio('tad-stability'));
+      R('Insertion angle', radio('tad-angle')); R('Post-insertion X-ray', radio('tad-xray'));
+      R('Notes', get('tad-proc-notes'));
+
+      S('Loading Protocol');
+      R('Loading timing', radio('tad-loading-time'));
+      const lt = radio('tad-loading-time');
+      if (lt && lt !== 'Not loaded yet — passive only') {
+        R('Force type', radio('tad-force-type'));
+        R('Force magnitude', radio('tad-force-mag'));
+        R('Force direction', radio('tad-force-dir'));
+      }
+      R('Loading notes', get('tad-loading-notes'));
+
+      S('Status & Follow-Up');
+      R('TAD status', radio('tad-status')); R('Peri-implant tissue', radio('tad-tissue'));
+      R('Next visit', get('tad-nv')); R('Referral', get('tad-referral'));
+      if(isChk('tad-aseptic')) RA('Aseptic technique and appropriate PPE were maintained and observed throughout the entire procedure. Confirmed by Clinician.');
+      R('Notes', get('tad-notes'));
       break;
     }
   }
@@ -4304,9 +4460,530 @@ function applyAdminSchema() {
   } catch(e) { console.warn('Admin schema apply error:', e); }
 }
 
+// ══════════════════════════════════════════════════════════════
+// TAD / MINI-SCREW — MULTI-SCREW SYSTEM
+// ══════════════════════════════════════════════════════════════
+
+let tadScrews = [];
+let tadActiveScrewIdx = -1;
+const TAD_COLORS = ['#1a7a7a','#c9a84c','#a02820','#6a1f9e','#1a5c3a','#0d3b6e'];
+
+function tadAddScrew() {
+  const idx = tadScrews.length;
+  tadScrews.push({
+    id:'screw_'+Date.now()+'_'+idx, label:'Screw #'+(idx+1),
+    jaw:'', maxSite:'', mandSite:'',
+    maxSide:'', mandSide:'', mandOtherSide:'',
+    izcSide:'', izcVert:'', palatalAP:'', siteNotes:'',
+    maxTeeth:[], mandTeeth:[],
+    diameter:'', length:'', head:'', brand:'', purposes:[],
+    anaes:'', pilot:'', torque:'', stability:'', angle:'', xray:'', procNotes:'',
+    loadingTime:'', forceType:'', forceMag:'', forceDir:'', loadingNotes:'',
+    status:'', tissue:'',
+  });
+  tadRenderTabs();
+  tadSwitchScrew(idx);
+}
+
+function tadRemoveScrew(idx) {
+  if (tadScrews.length === 1) { showToast('⚠️ At least one screw is required','error'); return; }
+  if (!confirm('Remove '+tadScrews[idx].label+'?')) return;
+  tadScrews.splice(idx,1);
+  tadScrews.forEach((s,i) => s.label='Screw #'+(i+1));
+  const newIdx = Math.min(idx, tadScrews.length-1);
+  tadRenderTabs();
+  tadSwitchScrew(newIdx);
+}
+
+function tadRenderTabs() {
+  const bar = document.getElementById('tad-screw-tabs');
+  if (!bar) return;
+  bar.innerHTML = '';
+  tadScrews.forEach((sc,i) => {
+    const color = TAD_COLORS[i % TAD_COLORS.length];
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-sm';
+    btn.style.cssText = `background:${i===tadActiveScrewIdx?color:'rgba(255,255,255,0.08)'};color:${i===tadActiveScrewIdx?'white':'rgba(255,255,255,0.6)'};border:1.5px solid ${color};border-radius:8px;transition:all .2s;font-size:0.76rem;gap:6px;`;
+    btn.innerHTML = sc.label+` <span style="opacity:.55;font-size:.65rem;" onclick="event.stopPropagation();tadRemoveScrew(${i})">✕</span>`;
+    btn.onclick = () => tadSwitchScrew(i);
+    bar.appendChild(btn);
+  });
+}
+
+function tadSwitchScrew(idx) {
+  if (tadActiveScrewIdx >= 0 && tadScrews[tadActiveScrewIdx]) tadCollectScrew(tadActiveScrewIdx);
+  tadActiveScrewIdx = idx;
+  tadRenderTabs();
+  tadRenderScrewCard(idx);
+}
+
+function tadRenderScrewCard(idx) {
+  const container = document.getElementById('tad-screws-container');
+  if (!container) return;
+  const sc = tadScrews[idx];
+  const color = TAD_COLORS[idx % TAD_COLORS.length];
+  const fid = f => `tad_${idx}_${f}`;
+  const fn  = f => `tad_${idx}_${f}`;
+  const v   = f => (sc[f]||'');
+
+  const radioOpts = (name, opts, cur) => opts.map(([val,lbl])=>
+    `<label><input type="radio" name="${fn(name)}" value="${val}" ${cur===val?'checked':''}><span>${lbl}</span></label>`
+  ).join('');
+
+  container.innerHTML = `
+  <div class="section-card" style="border-top:3px solid ${color};">
+    <div style="display:flex;align-items:center;gap:10px;padding:11px 15px;background:var(--grey-50);border-bottom:1px solid var(--grey-200);">
+      <div style="width:27px;height:27px;border-radius:7px;background:${color};color:white;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;">${idx+1}</div>
+      <span style="font-family:'DM Serif Display',serif;font-size:0.95rem;color:var(--navy);flex:1;">${sc.label}</span>
+      <input type="text" id="${fid('label')}" value="${sc.label}" placeholder="Label (e.g. Upper Right Buccal)"
+        style="border:1.5px solid var(--grey-200);border-radius:7px;padding:4px 9px;font-size:0.8rem;font-family:'DM Sans',sans-serif;outline:none;width:220px;"
+        oninput="tadScrews[${idx}].label=this.value;tadRenderTabs();">
+    </div>
+    <div style="padding:14px 15px;display:grid;gap:11px;">
+
+      <div class="sub-title" style="color:${color};">📍 Site of Insertion</div>
+      <div class="field"><label>Jaw</label>
+        <div class="toggle-group">
+          <label><input type="radio" name="${fn('jaw')}" value="Maxilla" ${sc.jaw==='Maxilla'?'checked':''} onchange="tadJawChange(${idx},this.value)"><span>⬆️ Maxilla</span></label>
+          <label><input type="radio" name="${fn('jaw')}" value="Mandible" ${sc.jaw==='Mandible'?'checked':''} onchange="tadJawChange(${idx},this.value)"><span>⬇️ Mandible</span></label>
+        </div>
+      </div>
+
+      <!-- Maxilla -->
+      <div id="${fid('max-wrap')}" style="display:${sc.jaw==='Maxilla'?'grid':'none'};gap:9px;">
+        <div class="field"><label>Maxillary Site</label>
+          <div class="toggle-group">
+            ${['Alveolar Buccal','Alveolar Palatal','Mid-palatal suture','Para-median palatal','Infra-zygomatic crest (IZC)'].map(s=>
+              `<label><input type="radio" name="${fn('maxSite')}" value="${s}" ${sc.maxSite===s?'checked':''} onchange="tadMaxSiteChange(${idx},this.value)"><span>${s}</span></label>`
+            ).join('')}
+          </div>
+        </div>
+        <div id="${fid('max-teeth-wrap')}" style="display:${(sc.maxSite==='Alveolar Buccal'||sc.maxSite==='Alveolar Palatal')?'block':'none'};">
+          <div style="background:var(--grey-50);border:1.5px solid var(--teal-mid);border-radius:9px;padding:11px 13px;">
+            <div class="sub-title" style="margin-bottom:8px;">Between Which Teeth — Upper</div>
+            <div id="${fid('max-tooth-row')}"></div>
+            <div style="font-size:0.74rem;color:var(--grey-500);margin-top:6px;">Selected: <span id="${fid('max-tooth-sel')}" style="font-weight:700;color:var(--teal);">${sc.maxTeeth.length?sc.maxTeeth.map(n=>toothLabel(n)).join(' & '):'—'}</span></div>
+            <div class="field" style="margin-top:8px;"><label>Side</label>
+              <div class="toggle-group">${radioOpts('maxSide',[['Right','Right'],['Left','Left'],['Bilateral','Bilateral']],sc.maxSide)}</div>
+            </div>
+          </div>
+        </div>
+        <div id="${fid('izc-wrap')}" style="display:${sc.maxSite==='Infra-zygomatic crest (IZC)'?'block':'none'};">
+          <div style="background:var(--grey-50);border:1.5px solid var(--teal-mid);border-radius:9px;padding:11px 13px;">
+            <div class="field"><label>IZC Side</label>
+              <div class="toggle-group">${radioOpts('izcSide',[['Right IZC','Right'],['Left IZC','Left'],['Bilateral IZC','Bilateral']],sc.izcSide)}</div>
+            </div>
+            <div class="field" style="margin-top:8px;"><label>Vertical Position</label>
+              <div class="toggle-group">${radioOpts('izcVert',[['High (above mucogingival junction)','High'],['Low (near mucogingival junction)','Low']],sc.izcVert)}</div>
+            </div>
+          </div>
+        </div>
+        <div id="${fid('palatal-wrap')}" style="display:${(sc.maxSite==='Mid-palatal suture'||sc.maxSite==='Para-median palatal')?'block':'none'};">
+          <div style="background:var(--grey-50);border:1.5px solid var(--teal-mid);border-radius:9px;padding:11px 13px;">
+            <div class="field"><label>Palatal Position (A-P)</label>
+              <div class="toggle-group">${radioOpts('palatalAP',[['Anterior palate (3-5mm from incisive foramen)','Anterior'],['Middle palate','Middle'],['Posterior palate','Posterior']],sc.palatalAP)}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mandible -->
+      <div id="${fid('mand-wrap')}" style="display:${sc.jaw==='Mandible'?'grid':'none'};gap:9px;">
+        <div class="field"><label>Mandibular Site</label>
+          <div class="toggle-group">
+            ${['Buccal Alveolar','Mandibular Buccal Shelf (MBS)','Retromolar area'].map(s=>
+              `<label><input type="radio" name="${fn('mandSite')}" value="${s}" ${sc.mandSite===s?'checked':''} onchange="tadMandSiteChange(${idx},this.value)"><span>${s}</span></label>`
+            ).join('')}
+          </div>
+        </div>
+        <div id="${fid('mand-teeth-wrap')}" style="display:${sc.mandSite==='Buccal Alveolar'?'block':'none'};">
+          <div style="background:var(--grey-50);border:1.5px solid var(--teal-mid);border-radius:9px;padding:11px 13px;">
+            <div class="sub-title" style="margin-bottom:8px;">Between Which Teeth — Lower</div>
+            <div id="${fid('mand-tooth-row')}"></div>
+            <div style="font-size:0.74rem;color:var(--grey-500);margin-top:6px;">Selected: <span id="${fid('mand-tooth-sel')}" style="font-weight:700;color:var(--teal);">${sc.mandTeeth.length?sc.mandTeeth.map(n=>toothLabel(n)).join(' & '):'—'}</span></div>
+            <div class="field" style="margin-top:8px;"><label>Side</label>
+              <div class="toggle-group">${radioOpts('mandSide',[['Right','Right'],['Left','Left'],['Bilateral','Bilateral']],sc.mandSide)}</div>
+            </div>
+          </div>
+        </div>
+        <div id="${fid('mand-other-wrap')}" style="display:${(sc.mandSite==='Mandibular Buccal Shelf (MBS)'||sc.mandSite==='Retromolar area')?'block':'none'};">
+          <div style="background:var(--grey-50);border:1.5px solid var(--teal-mid);border-radius:9px;padding:11px 13px;">
+            <div class="field"><label>Side</label>
+              <div class="toggle-group">${radioOpts('mandOtherSide',[['Right','Right'],['Left','Left'],['Bilateral','Bilateral']],sc.mandOtherSide)}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field"><label>Site Notes</label>
+        <input type="text" id="${fid('siteNotes')}" value="${v('siteNotes')}" placeholder="Angulation, depth, additional details...">
+      </div>
+
+      <!-- SPECS -->
+      <div class="sub-title" style="color:${color};margin-top:4px;">🔬 Screw Specifications</div>
+      <div class="grid-3">
+        <div class="field"><label>Diameter</label><div class="toggle-group">${radioOpts('diameter',[['1.4 mm','1.4 mm'],['1.6 mm','1.6 mm'],['1.8 mm','1.8 mm'],['2.0 mm','2.0 mm']],sc.diameter)}</div></div>
+        <div class="field"><label>Length</label><div class="toggle-group">${radioOpts('length',[['6 mm','6 mm'],['8 mm','8 mm'],['10 mm','10 mm'],['12 mm','12 mm'],['14 mm','14 mm']],sc.length)}</div></div>
+        <div class="field"><label>Head Type</label><div class="toggle-group">${radioOpts('head',[['Bracket-like head','Bracket-like'],['Button head','Button'],['Cross-slot head','Cross-slot']],sc.head)}</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="field"><label>Brand</label><div class="toggle-group">${radioOpts('brand',[['AbsoAnchor','AbsoAnchor'],['Infinitas','Infinitas'],['TOMAS','TOMAS'],['Orthoimplant','Orthoimplant'],['Other','Other']],sc.brand)}</div></div>
+        <div class="field"><label>Purpose</label><div class="toggle-group">
+          ${[['anch','Anchorage'],['intr','Intrusion'],['dist','Distalization'],['retr','En-masse retraction'],['molar','Molar uprighting'],['midline','Midline correction'],['other','Other']].map(([k,l])=>
+            `<label><input type="checkbox" id="${fid('p_'+k)}" ${sc.purposes.includes(k)?'checked':''}><span>${l}</span></label>`
+          ).join('')}
+        </div></div>
+      </div>
+
+      <!-- PROCEDURE -->
+      <div class="sub-title" style="color:${color};margin-top:4px;">💉 Clinical Procedure</div>
+      <div class="grid-2">
+        <div class="field"><label>Anaesthesia</label><div class="toggle-group">
+          ${radioOpts('anaes',[
+            ['Infiltration — Lidocaine 2% with Epinephrine 1:80,000','Lidocaine 2% + Epi 1:80k'],
+            ['Infiltration — Articaine 4% with Epinephrine 1:100,000','Articaine 4% + Epi 1:100k'],
+            ['Infiltration — Mepivacaine 3% (no vasoconstrictor)','Mepivacaine 3%'],
+            ['Topical anaesthesia only','Topical only'],
+            ['Palatal injection — Greater palatine block','Greater palatine block'],
+            ['IANB — Inferior alveolar nerve block','IANB']
+          ],sc.anaes)}
+        </div></div>
+        <div class="field"><label>Pilot Hole</label><div class="toggle-group">
+          ${radioOpts('pilot',[['No pilot hole — freehand insertion','No pilot hole'],['Pilot hole drilled — slow-speed handpiece','Pilot hole drilled'],['Tissue punch used','Tissue punch']],sc.pilot)}
+        </div></div>
+      </div>
+      <div class="grid-2">
+        <div class="field"><label>Insertion Torque</label>
+          <div class="toggle-group">${radioOpts('torque',[['Low torque — smooth insertion','🟢 Low — smooth'],['Moderate torque — slight resistance','🟡 Moderate'],['High torque — significant resistance','🔴 High']],sc.torque)}</div>
+          <div style="background:var(--teal-light);border:1px solid var(--teal-mid);border-radius:7px;padding:7px 10px;font-size:0.74rem;color:var(--teal);margin-top:6px;">💡 High torque → better stability but higher bone stress.</div>
+        </div>
+        <div class="field"><label>Primary Stability</label><div class="toggle-group">
+          ${radioOpts('stability',[['Stable — no mobility','✅ Stable'],['Slightly mobile — monitor','⚠️ Slightly mobile'],['Mobile — repositioned','❌ Repositioned'],['Mobile — removed','❌ Removed']],sc.stability)}
+        </div></div>
+      </div>
+      <div class="grid-2">
+        <div class="field"><label>Insertion Angle</label><div class="toggle-group">
+          ${radioOpts('angle',[['30–40° (recommended alveolar)','30–40° (alveolar)'],['60–70° (recommended palatal)','60–70° (palatal)'],['70–80° (IZC / MBS)','70–80° (IZC/MBS)'],['90° (perpendicular)','90°']],sc.angle)}
+        </div></div>
+        <div class="field"><label>Post-insertion X-ray</label><div class="toggle-group">
+          ${radioOpts('xray',[['Taken — clear of root structures','✅ Clear of roots'],['Taken — proximity to root noted, acceptable','⚠️ Proximity — acceptable'],['Taken — repositioned due to root proximity','❌ Repositioned'],['Not taken at this visit','Not taken']],sc.xray)}
+        </div></div>
+      </div>
+      <div class="field"><label>Procedure Notes</label>
+        <textarea id="${fid('procNotes')}" placeholder="Complications, patient reaction, tissue condition...">${v('procNotes')}</textarea>
+      </div>
+
+      <!-- LOADING -->
+      <div class="sub-title" style="color:${color};margin-top:4px;">⚡ Loading Protocol</div>
+      <div class="grid-2">
+        <div class="field"><label>Loading Timing</label><div class="toggle-group">
+          ${radioOpts('loadingTime',[['Immediate loading — same visit','Immediate — same visit'],['Delayed loading — 2 weeks','Delayed — 2 weeks'],['Delayed loading — 4 weeks','Delayed — 4 weeks'],['Not loaded yet — passive only','Passive only']],sc.loadingTime)}
+        </div></div>
+        <div class="field"><label>Force Delivery Type</label><div class="toggle-group">
+          ${radioOpts('forceType',[['Power chain','Power chain'],['NiTi closed coil spring','NiTi coil spring'],['Ligature wire (0.010″)','Ligature wire'],['Stainless steel chain','SS chain'],['Elastic thread','Elastic thread'],['TMA cantilever','TMA cantilever']],sc.forceType)}
+        </div></div>
+      </div>
+      <div class="grid-2">
+        <div class="field"><label>Force Magnitude</label><div class="toggle-group">
+          ${radioOpts('forceMag',[['50–100 g','50–100 g'],['100–150 g','100–150 g'],['150–200 g','150–200 g'],['200–250 g','200–250 g'],['250–300 g','250–300 g'],['>300 g','>300 g']],sc.forceMag)}
+        </div></div>
+        <div class="field"><label>Force Direction</label><div class="toggle-group">
+          ${radioOpts('forceDir',[['Intrusive','Intrusive'],['Retractive','Retractive'],['Distalizing','Distalizing'],['Mesialization','Mesialization'],['Extrusive','Extrusive'],['Multi-directional','Multi-directional']],sc.forceDir)}
+        </div></div>
+      </div>
+      <div class="field"><label>Loading Notes</label>
+        <textarea id="${fid('loadingNotes')}" placeholder="Mechanics, attachment points, force vectors...">${v('loadingNotes')}</textarea>
+      </div>
+
+      <!-- STATUS -->
+      <div class="sub-title" style="color:${color};margin-top:4px;">📊 TAD Status</div>
+      <div class="grid-2">
+        <div class="field"><label>Current Status</label><div class="toggle-group">
+          ${radioOpts('status',[['Active — loaded and stable','✅ Active & stable'],['Passive — inserted, not yet loaded','🔵 Passive'],['Treatment objective achieved — to be removed','🏁 Objective achieved'],['Failed — removed and replaced','❌ Failed — replaced'],['Removed — treatment complete','✂️ Removed']],sc.status)}
+        </div></div>
+        <div class="field"><label>Peri-implant Tissue</label><div class="toggle-group">
+          ${radioOpts('tissue',[['Healthy — no inflammation','✅ Healthy'],['Mild inflammation — OH reinforced','⚠️ Mild'],['Moderate inflammation — chlorhexidine prescribed','🔴 Moderate — CHX'],['Hyperplastic tissue — surgical review needed','❌ Hyperplastic']],sc.tissue)}
+        </div></div>
+      </div>
+
+    </div>
+  </div>`;
+
+  // Build mini tooth charts if needed
+  if (sc.maxSite === 'Alveolar Buccal' || sc.maxSite === 'Alveolar Palatal') {
+    const set = new Set(sc.maxTeeth);
+    buildMiniChart(fid('max-tooth-row'), set, () => {
+      sc.maxTeeth = [...set];
+      const lbl = document.getElementById(fid('max-tooth-sel'));
+      if (lbl) lbl.textContent = sc.maxTeeth.length ? sc.maxTeeth.map(n=>toothLabel(n)).join(' & ') : '—';
+    }, upperTeeth);
+  }
+  if (sc.mandSite === 'Buccal Alveolar') {
+    const set = new Set(sc.mandTeeth);
+    buildMiniChart(fid('mand-tooth-row'), set, () => {
+      sc.mandTeeth = [...set];
+      const lbl = document.getElementById(fid('mand-tooth-sel'));
+      if (lbl) lbl.textContent = sc.mandTeeth.length ? sc.mandTeeth.map(n=>toothLabel(n)).join(' & ') : '—';
+    }, lowerTeeth);
+  }
+}
+
+function tadJawChange(idx, val) {
+  tadScrews[idx].jaw = val;
+  const fid = f => `tad_${idx}_${f}`;
+  const mxW = document.getElementById(fid('max-wrap'));
+  const mnW = document.getElementById(fid('mand-wrap'));
+  if (mxW) mxW.style.display = val==='Maxilla'  ? 'grid' : 'none';
+  if (mnW) mnW.style.display = val==='Mandible' ? 'grid' : 'none';
+}
+
+function tadMaxSiteChange(idx, val) {
+  tadScrews[idx].maxSite = val;
+  const fid = f => `tad_${idx}_${f}`;
+  const isAlv = val==='Alveolar Buccal'||val==='Alveolar Palatal';
+  const isIZC = val==='Infra-zygomatic crest (IZC)';
+  const isPal = val==='Mid-palatal suture'||val==='Para-median palatal';
+  document.getElementById(fid('max-teeth-wrap')).style.display = isAlv ? 'block':'none';
+  document.getElementById(fid('izc-wrap')).style.display       = isIZC ? 'block':'none';
+  document.getElementById(fid('palatal-wrap')).style.display   = isPal ? 'block':'none';
+  if (isAlv && !document.getElementById(fid('max-tooth-row')).children.length) {
+    const set = new Set(tadScrews[idx].maxTeeth);
+    buildMiniChart(fid('max-tooth-row'), set, () => {
+      tadScrews[idx].maxTeeth = [...set];
+      const lbl = document.getElementById(fid('max-tooth-sel'));
+      if (lbl) lbl.textContent = tadScrews[idx].maxTeeth.length ? tadScrews[idx].maxTeeth.map(n=>toothLabel(n)).join(' & ') : '—';
+    }, upperTeeth);
+  }
+}
+
+function tadMandSiteChange(idx, val) {
+  tadScrews[idx].mandSite = val;
+  const fid = f => `tad_${idx}_${f}`;
+  const isBuc = val==='Buccal Alveolar';
+  document.getElementById(fid('mand-teeth-wrap')).style.display = isBuc  ? 'block':'none';
+  document.getElementById(fid('mand-other-wrap')).style.display = !isBuc ? 'block':'none';
+  if (isBuc && !document.getElementById(fid('mand-tooth-row')).children.length) {
+    const set = new Set(tadScrews[idx].mandTeeth);
+    buildMiniChart(fid('mand-tooth-row'), set, () => {
+      tadScrews[idx].mandTeeth = [...set];
+      const lbl = document.getElementById(fid('mand-tooth-sel'));
+      if (lbl) lbl.textContent = tadScrews[idx].mandTeeth.length ? tadScrews[idx].mandTeeth.map(n=>toothLabel(n)).join(' & ') : '—';
+    }, lowerTeeth);
+  }
+}
+
+function tadCollectScrew(idx) {
+  const sc = tadScrews[idx];
+  if (!sc) return;
+  const container = document.getElementById('tad-screws-container');
+  if (!container) return;
+  const fid = f => `tad_${idx}_${f}`;
+  const fn  = f => `tad_${idx}_${f}`;
+  const rv  = name => { const el = container.querySelector(`[name="${name}"]:checked`); return el?el.value:''; };
+  sc.label          = document.getElementById(fid('label'))?.value || sc.label;
+  sc.jaw            = rv(fn('jaw'));
+  sc.maxSite        = rv(fn('maxSite'));
+  sc.mandSite       = rv(fn('mandSite'));
+  sc.maxSide        = rv(fn('maxSide'));
+  sc.mandSide       = rv(fn('mandSide'));
+  sc.mandOtherSide  = rv(fn('mandOtherSide'));
+  sc.izcSide        = rv(fn('izcSide'));
+  sc.izcVert        = rv(fn('izcVert'));
+  sc.palatalAP      = rv(fn('palatalAP'));
+  sc.siteNotes      = document.getElementById(fid('siteNotes'))?.value||'';
+  sc.diameter       = rv(fn('diameter'));
+  sc.length         = rv(fn('length'));
+  sc.head           = rv(fn('head'));
+  sc.brand          = rv(fn('brand'));
+  sc.purposes       = ['anch','intr','dist','retr','molar','midline','other'].filter(k=>document.getElementById(fid('p_'+k))?.checked);
+  sc.anaes          = rv(fn('anaes'));
+  sc.pilot          = rv(fn('pilot'));
+  sc.torque         = rv(fn('torque'));
+  sc.stability      = rv(fn('stability'));
+  sc.angle          = rv(fn('angle'));
+  sc.xray           = rv(fn('xray'));
+  sc.procNotes      = document.getElementById(fid('procNotes'))?.value||'';
+  sc.loadingTime    = rv(fn('loadingTime'));
+  sc.forceType      = rv(fn('forceType'));
+  sc.forceMag       = rv(fn('forceMag'));
+  sc.forceDir       = rv(fn('forceDir'));
+  sc.loadingNotes   = document.getElementById(fid('loadingNotes'))?.value||'';
+  sc.status         = rv(fn('status'));
+  sc.tissue         = rv(fn('tissue'));
+}
+
+function buildTadSummary() {
+  if (tadActiveScrewIdx >= 0) tadCollectScrew(tadActiveScrewIdx);
+  const L=[]; const b=(l,v)=>{if(v&&String(v).trim())L.push(`  · ${l}: ${v}`);}; const s=t=>L.push(`\n${t}`);
+  const purposeMap={anch:'Anchorage',intr:'Intrusion',dist:'Distalization',retr:'En-masse retraction',molar:'Molar uprighting',midline:'Midline correction',other:'Other'};
+  s('TAD / Mini-screw Session');
+  b('Patient',get('tad-name')); b('Visit #',get('tad-visit-no')); b('Date',get('tad-date')); b('Clinician',get('tad-clinician'));
+  b('Total screws placed', tadScrews.length ? String(tadScrews.length) : '');
+  tadScrews.forEach((sc,i) => {
+    s(`── ${sc.label} ──`);
+    b('Jaw', sc.jaw);
+    if (sc.jaw==='Maxilla') {
+      b('Site', sc.maxSite);
+      if (sc.maxTeeth.length) b('Between teeth', sc.maxTeeth.map(n=>toothLabel(n)).join(' & '));
+      b('Side', sc.maxSide||sc.izcSide||'');
+      b('IZC vertical', sc.izcVert); b('Palatal position', sc.palatalAP);
+    } else {
+      b('Site', sc.mandSite);
+      if (sc.mandTeeth.length) b('Between teeth', sc.mandTeeth.map(n=>toothLabel(n)).join(' & '));
+      b('Side', sc.mandSide||sc.mandOtherSide||'');
+    }
+    b('Site notes', sc.siteNotes);
+    b('Screw specs', [sc.diameter,sc.length,sc.head,sc.brand].filter(Boolean).join(' · '));
+    if (sc.purposes.length) b('Purpose', sc.purposes.map(k=>purposeMap[k]).join(', '));
+    b('Anaesthesia', sc.anaes); b('Pilot hole', sc.pilot);
+    b('Insertion torque', sc.torque); b('Primary stability', sc.stability);
+    b('Insertion angle', sc.angle); b('Post-insertion X-ray', sc.xray);
+    b('Procedure notes', sc.procNotes);
+    b('Loading', sc.loadingTime);
+    if (sc.loadingTime && sc.loadingTime!=='Not loaded yet — passive only') {
+      b('Force type', sc.forceType); b('Force magnitude', sc.forceMag); b('Force direction', sc.forceDir);
+    }
+    b('Loading notes', sc.loadingNotes);
+    b('TAD status', sc.status); b('Peri-implant tissue', sc.tissue);
+  });
+  s('Session Follow-Up');
+  b('N.V.',get('tad-nv')); b('Referral',get('tad-referral'));
+  b('Aseptic technique & PPE',isChk('tad-aseptic')?'Maintained and observed':'');
+  b('Overall notes',get('tad-notes'));
+  return L.join('\n').trim();
+}
+
+// Stubs kept for compatibility
+function updateTadJaw(){} function updateTadSiteDetail(){} function updateTadMandSiteDetail(){} function updateTadLoading(){}
+
 // ── Listen for admin changes (when admin panel is open in another tab) ─
 window.addEventListener('storage', e => {
   if (e.key === 'ortho_admin_update') applyAdminSchema();
+});
+
+// ══════════════════════════════════════════════════════════════
+// AUTO-SAVE & UNSAVED CHANGES TRACKING
+// ══════════════════════════════════════════════════════════════
+
+// Track which tabs have unsaved changes
+const unsavedTabs = new Set();
+const ALL_TABS = ['exam','plan','bond','fu-fixed','fu-aligner','emergency','debond','tad'];
+
+// Mark current tab as having unsaved changes
+function markUnsaved() {
+  if (unsavedTabs.has(currentTab)) return; // already marked
+  unsavedTabs.add(currentTab);
+  const btn = document.getElementById('tbtn-' + currentTab);
+  if (btn) btn.classList.add('has-unsaved');
+}
+
+// Clear unsaved mark for a tab (called after save)
+function markSaved(tab) {
+  unsavedTabs.delete(tab);
+  const btn = document.getElementById('tbtn-' + tab);
+  if (btn) btn.classList.remove('has-unsaved');
+}
+
+// Show the autosave indicator
+function showAutosaveIndicator(state, msg) {
+  const el   = document.getElementById('autosave-indicator');
+  const text = document.getElementById('autosave-text');
+  if (!el || !text) return;
+  el.className = 'autosave-indicator visible ' + state;
+  text.textContent = msg;
+}
+
+function hideAutosaveIndicator() {
+  const el = document.getElementById('autosave-indicator');
+  if (el) el.className = 'autosave-indicator';
+}
+
+// Silent auto-save for a single tab
+function autoSaveTab(tab) {
+  // Re-use the existing saveCurrentForm logic but for a specific tab
+  const savedTab = currentTab;
+  // Temporarily switch context for collection
+  const panel = document.getElementById('panel-' + tab);
+  if (!panel) return;
+
+  const data = { _tab: tab };
+  panel.querySelectorAll('input,select,textarea').forEach(el => {
+    if (!el.id && !el.name) return;
+    if (el.type === 'checkbox') data[el.id] = el.checked;
+    else if (el.type === 'radio') { if (el.checked) data['radio__' + el.name] = el.value; }
+    else if (el.id) data[el.id] = el.value;
+  });
+
+  // Wire states
+  ['bond-wire-selector','fuf-wire-selector','em-wire-selector'].forEach(cid => {
+    if (wireState[cid]) data['wires__' + cid] = wireState[cid];
+  });
+  if (tab === 'fu-fixed') {
+    data['_lig_upper'] = [...ligSelectedTeeth.upper.short, ...[...ligSelectedTeeth.upper.fig8]];
+    data['_lig_lower'] = [...ligSelectedTeeth.lower.short, ...[...ligSelectedTeeth.lower.fig8]];
+    ['upper','lower'].forEach(arch => {
+      const cid = `fuf-aux-wire-${arch}`;
+      if (wireState[cid]) data['wires__' + cid] = wireState[cid];
+    });
+  }
+  if (tab === 'emergency') data['_em_pills'] = [...activeEmPills];
+  if (tab === 'exam')      data['__teeth']   = { ...toothState };
+
+  localStorage.setItem('ortho_v4_' + tab, JSON.stringify(data));
+  localStorage.setItem('ortho_v4_autosave_time', Date.now().toString());
+  markSaved(tab);
+}
+
+// Auto-save all tabs that have unsaved changes
+function runAutoSave() {
+  const dirty = [...unsavedTabs];
+  if (dirty.length === 0) return;
+
+  showAutosaveIndicator('saving', 'جاري الحفظ التلقائي...');
+
+  // Small delay so indicator appears before heavy work
+  setTimeout(() => {
+    dirty.forEach(tab => autoSaveTab(tab));
+    showAutosaveIndicator('saved', '✓ تم الحفظ التلقائي');
+    setTimeout(hideAutosaveIndicator, 2200);
+  }, 120);
+}
+
+// Listen for ANY change in the page and mark current tab dirty
+function onAnyChange() {
+  markUnsaved();
+}
+
+document.addEventListener('input',  onAnyChange);
+document.addEventListener('change', onAnyChange);
+
+// Override saveCurrentForm to also clear unsaved mark
+const _origSave = saveCurrentForm;
+saveCurrentForm = function() {
+  _origSave();
+  markSaved(currentTab);
+};
+
+// Override clearCurrentForm to also clear unsaved mark
+const _origClear = clearCurrentForm;
+clearCurrentForm = function() {
+  _origClear();
+  markSaved(currentTab);
+};
+
+// Run auto-save every 60 seconds
+setInterval(runAutoSave, 60_000);
+
+// ── beforeunload — warn if there are unsaved changes ──────────────────
+window.addEventListener('beforeunload', e => {
+  if (unsavedTabs.size === 0) return; // nothing unsaved → let go freely
+
+  // Auto-save silently first so data is not lost even if user leaves
+  [...unsavedTabs].forEach(tab => autoSaveTab(tab));
+
+  // Still show browser confirm dialog as an extra warning
+  e.preventDefault();
+  e.returnValue = ''; // required for Chrome to show the dialog
 });
 
 // ── Init ───────────────────────────────────────────────────────────────
@@ -4320,10 +4997,28 @@ window.addEventListener('storage', e => {
   });
 
   applyAdminSchema();
-  ['exam','plan','bond','fu-fixed','fu-aligner','emergency','debond'].forEach(loadForm);
+  ['exam','plan','bond','fu-fixed','fu-aligner','emergency','debond','tad'].forEach(loadForm);
   updateApplianceCard();
   updateBondCard();
   updateProgress();
+
+  // Default: all aseptic checkboxes checked (including tad)
+  ['aseptic-confirm','bond-aseptic','fuf-aseptic','fua-aseptic','em-aseptic','db-aseptic','tad-aseptic'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.checked=true;
+  });
+
+  // Initialize TAD with one screw by default
+  if (tadScrews.length === 0) tadAddScrew();
+
+  // Show last autosave time if available
+  const lastSave = localStorage.getItem('ortho_v4_autosave_time');
+  if (lastSave) {
+    const diff = Math.round((Date.now() - parseInt(lastSave)) / 60000);
+    if (diff < 60) {
+      showAutosaveIndicator('saved', `✓ آخر حفظ: منذ ${diff === 0 ? 'أقل من دقيقة' : diff + ' دقيقة'}`);
+      setTimeout(hideAutosaveIndicator, 3000);
+    }
+  }
 })();
 </script>
 </body>
