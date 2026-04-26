@@ -2070,6 +2070,64 @@
           </div>
         </div>
       </div>
+
+      <!-- TAD Status — only shown if patient has TAD -->
+      <div style="margin-top:4px;">
+        <div class="sub-title" style="color:var(--grey-600);">🔩 TAD / Mini-screw Status
+          <label style="margin-left:10px;display:inline-flex;align-items:center;gap:6px;font-size:0.78rem;font-weight:500;text-transform:none;letter-spacing:0;color:var(--grey-600);cursor:pointer;">
+            <input type="checkbox" id="fuf-has-tad" onchange="toggleTadStatus('fuf')" style="accent-color:var(--teal);width:14px;height:14px;">
+            Patient has active TAD
+          </label>
+        </div>
+        <div id="fuf-tad-status-wrap" style="display:none;">
+          <div style="background:var(--grey-50);border:1.5px solid var(--grey-200);border-radius:9px;padding:12px 14px;display:grid;gap:10px;">
+            <div class="grid-2">
+              <div class="field">
+                <label>TAD Stability</label>
+                <div class="toggle-group">
+                  <label><input type="radio" name="fuf-tad-stability" value="Stable — no mobility"><span>✅ Stable</span></label>
+                  <label><input type="radio" name="fuf-tad-stability" value="Slightly mobile — monitor"><span>⚠️ Slightly mobile</span></label>
+                  <label><input type="radio" name="fuf-tad-stability" value="Mobile — needs removal"><span>❌ Mobile</span></label>
+                </div>
+              </div>
+              <div class="field">
+                <label>TAD Loading Status</label>
+                <div class="toggle-group">
+                  <label><input type="radio" name="fuf-tad-loading" value="Active — force applied"><span>✅ Active</span></label>
+                  <label><input type="radio" name="fuf-tad-loading" value="Passive — resting"><span>🔵 Passive</span></label>
+                  <label><input type="radio" name="fuf-tad-loading" value="Force modified this visit"><span>🔄 Modified</span></label>
+                  <label><input type="radio" name="fuf-tad-loading" value="Removed this visit"><span>✂️ Removed</span></label>
+                </div>
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="field">
+                <label>Peri-implant Tissue</label>
+                <div class="toggle-group">
+                  <label><input type="radio" name="fuf-tad-tissue" value="Healthy — no inflammation"><span>✅ Healthy</span></label>
+                  <label><input type="radio" name="fuf-tad-tissue" value="Mild inflammation — OH reinforced"><span>⚠️ Mild — OH reinforced</span></label>
+                  <label><input type="radio" name="fuf-tad-tissue" value="Moderate — chlorhexidine prescribed"><span>🔴 Moderate — CHX</span></label>
+                  <label><input type="radio" name="fuf-tad-tissue" value="Hyperplastic — surgical review"><span>❌ Hyperplastic</span></label>
+                </div>
+              </div>
+              <div class="field">
+                <label>Mechanical Progress</label>
+                <div class="toggle-group">
+                  <label><input type="radio" name="fuf-tad-progress" value="On track — objective progressing"><span>✅ On track</span></label>
+                  <label><input type="radio" name="fuf-tad-progress" value="Slower than expected — monitor"><span>⚠️ Slower than expected</span></label>
+                  <label><input type="radio" name="fuf-tad-progress" value="Objective achieved — TAD to be removed"><span>🏁 Objective achieved</span></label>
+                  <label><input type="radio" name="fuf-tad-progress" value="Failed — re-insertion planned"><span>❌ Failed — re-insertion planned</span></label>
+                </div>
+              </div>
+            </div>
+            <div class="field">
+              <label>TAD Notes</label>
+              <input type="text" id="fuf-tad-notes" placeholder="Force magnitude, attachment point changes, patient feedback...">
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -2309,6 +2367,64 @@
           </div>
         </div>
       </div>
+
+      <!-- TAD Status -->
+      <div style="margin-top:4px;">
+        <div class="sub-title" style="color:var(--grey-600);">🔩 TAD / Mini-screw Status
+          <label style="margin-left:10px;display:inline-flex;align-items:center;gap:6px;font-size:0.78rem;font-weight:500;text-transform:none;letter-spacing:0;color:var(--grey-600);cursor:pointer;">
+            <input type="checkbox" id="fua-has-tad" onchange="toggleTadStatus('fua')" style="accent-color:var(--teal);width:14px;height:14px;">
+            Patient has active TAD
+          </label>
+        </div>
+        <div id="fua-tad-status-wrap" style="display:none;">
+          <div style="background:var(--grey-50);border:1.5px solid var(--grey-200);border-radius:9px;padding:12px 14px;display:grid;gap:10px;">
+            <div class="grid-2">
+              <div class="field">
+                <label>TAD Stability</label>
+                <div class="toggle-group">
+                  <label><input type="radio" name="fua-tad-stability" value="Stable — no mobility"><span>✅ Stable</span></label>
+                  <label><input type="radio" name="fua-tad-stability" value="Slightly mobile — monitor"><span>⚠️ Slightly mobile</span></label>
+                  <label><input type="radio" name="fua-tad-stability" value="Mobile — needs removal"><span>❌ Mobile</span></label>
+                </div>
+              </div>
+              <div class="field">
+                <label>TAD Loading Status</label>
+                <div class="toggle-group">
+                  <label><input type="radio" name="fua-tad-loading" value="Active — force applied"><span>✅ Active</span></label>
+                  <label><input type="radio" name="fua-tad-loading" value="Passive — resting"><span>🔵 Passive</span></label>
+                  <label><input type="radio" name="fua-tad-loading" value="Force modified this visit"><span>🔄 Modified</span></label>
+                  <label><input type="radio" name="fua-tad-loading" value="Removed this visit"><span>✂️ Removed</span></label>
+                </div>
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="field">
+                <label>Peri-implant Tissue</label>
+                <div class="toggle-group">
+                  <label><input type="radio" name="fua-tad-tissue" value="Healthy — no inflammation"><span>✅ Healthy</span></label>
+                  <label><input type="radio" name="fua-tad-tissue" value="Mild inflammation — OH reinforced"><span>⚠️ Mild — OH reinforced</span></label>
+                  <label><input type="radio" name="fua-tad-tissue" value="Moderate — chlorhexidine prescribed"><span>🔴 Moderate — CHX</span></label>
+                  <label><input type="radio" name="fua-tad-tissue" value="Hyperplastic — surgical review"><span>❌ Hyperplastic</span></label>
+                </div>
+              </div>
+              <div class="field">
+                <label>Mechanical Progress</label>
+                <div class="toggle-group">
+                  <label><input type="radio" name="fua-tad-progress" value="On track — objective progressing"><span>✅ On track</span></label>
+                  <label><input type="radio" name="fua-tad-progress" value="Slower than expected — monitor"><span>⚠️ Slower than expected</span></label>
+                  <label><input type="radio" name="fua-tad-progress" value="Objective achieved — TAD to be removed"><span>🏁 Objective achieved</span></label>
+                  <label><input type="radio" name="fua-tad-progress" value="Failed — re-insertion planned"><span>❌ Failed — re-insertion planned</span></label>
+                </div>
+              </div>
+            </div>
+            <div class="field">
+              <label>TAD Notes</label>
+              <input type="text" id="fua-tad-notes" placeholder="Force magnitude, attachment point changes, patient feedback...">
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="grid-2">
         <div class="field"><label>Next Visit</label><textarea id="fua-nv" placeholder="e.g. 6–8 weeks — aligner check / new set delivery"></textarea></div>
         <div class="field"><label>Referral</label><textarea id="fua-referral" placeholder="To whom, reason, urgency..."></textarea></div>
@@ -3293,6 +3409,14 @@ function buildFuFixedSummary() {
   b('Mechanics notes',get('fuf-mech-notes'));
   s('Progress');
   b('Alignment progress',radio('fuf-align-prog')); b('Compliance',radio('fuf-compliance')); b('Oral hygiene',radio('fuf-oh'));
+  if (isChk('fuf-has-tad')) {
+    s('TAD / Mini-screw Status');
+    b('TAD stability',       radio('fuf-tad-stability'));
+    b('TAD loading status',  radio('fuf-tad-loading'));
+    b('Peri-implant tissue', radio('fuf-tad-tissue'));
+    b('Mechanical progress', radio('fuf-tad-progress'));
+    b('TAD notes',           get('fuf-tad-notes'));
+  }
   s('Completion');
   b('N.V.',get('fuf-nv')); b('Referral',get('fuf-referral')); b('Aseptic technique & PPE',isChk('fuf-aseptic')?'Maintained and observed':''); b('Notes',get('fuf-notes'));
   return L.join('\n').trim();
@@ -3325,7 +3449,16 @@ function buildFuAlignerSummary() {
   b('Elastic notes',get('fua-elastic-notes'));
   if(isChk('fua-elastic-inst')) L.push('  · Proper use and timing of elastics instructed to the patient');
   s('Completion');
-  b('Oral hygiene',radio('fua-oh')); b('Wear compliance',radio('fua-wear-comply')); b('N.V.',get('fua-nv')); b('Referral',get('fua-referral')); b('Aseptic technique & PPE',isChk('fua-aseptic')?'Maintained and observed':''); b('Notes',get('fua-notes'));
+  b('Oral hygiene',radio('fua-oh')); b('Wear compliance',radio('fua-wear-comply'));
+  if (isChk('fua-has-tad')) {
+    s('TAD / Mini-screw Status');
+    b('TAD stability',       radio('fua-tad-stability'));
+    b('TAD loading status',  radio('fua-tad-loading'));
+    b('Peri-implant tissue', radio('fua-tad-tissue'));
+    b('Mechanical progress', radio('fua-tad-progress'));
+    b('TAD notes',           get('fua-tad-notes'));
+  }
+  b('N.V.',get('fua-nv')); b('Referral',get('fua-referral')); b('Aseptic technique & PPE',isChk('fua-aseptic')?'Maintained and observed':''); b('Notes',get('fua-notes'));
   return L.join('\n').trim();
 }
 
@@ -3743,6 +3876,14 @@ function buildPrintSections() {
       S('Progress Assessment');
       R('Alignment progress', radio('fuf-align-prog')); R('Patient compliance', radio('fuf-compliance'));
       R('Oral hygiene', radio('fuf-oh'));
+      if (isChk('fuf-has-tad')) {
+        S('TAD / Mini-screw Status');
+        R('TAD stability',           radio('fuf-tad-stability'));
+        R('TAD loading status',      radio('fuf-tad-loading'));
+        R('Peri-implant tissue',     radio('fuf-tad-tissue'));
+        R('Mechanical progress',     radio('fuf-tad-progress'));
+        R('TAD notes',               get('fuf-tad-notes'));
+      }
 
       S('Visit Completion');
       R('Next visit', get('fuf-nv')); R('Referral', get('fuf-referral'));
@@ -3786,6 +3927,14 @@ function buildPrintSections() {
       if(isChk('fua-elastic-inst')) R('Elastic instructions', 'Proper use and timing instructed to the patient');
       S('Visit Completion');
       R('Oral hygiene', radio('fua-oh')); R('Wear compliance', radio('fua-wear-comply'));
+      if (isChk('fua-has-tad')) {
+        S('TAD / Mini-screw Status');
+        R('TAD stability',       radio('fua-tad-stability'));
+        R('TAD loading status',  radio('fua-tad-loading'));
+        R('Peri-implant tissue', radio('fua-tad-tissue'));
+        R('Mechanical progress', radio('fua-tad-progress'));
+        R('TAD notes',           get('fua-tad-notes'));
+      }
       R('Next visit', get('fua-nv')); R('Referral', get('fua-referral'));
       if(isChk('fua-aseptic')) RA('Aseptic technique and appropriate PPE were maintained and observed throughout the entire procedure. Confirmed by Clinician.');
       R('Notes', get('fua-notes'));
@@ -4695,17 +4844,6 @@ function tadRenderScrewCard(idx) {
         <textarea id="${fid('loadingNotes')}" placeholder="Mechanics, attachment points, force vectors...">${v('loadingNotes')}</textarea>
       </div>
 
-      <!-- STATUS -->
-      <div class="sub-title" style="color:${color};margin-top:4px;">📊 TAD Status</div>
-      <div class="grid-2">
-        <div class="field"><label>Current Status</label><div class="toggle-group">
-          ${radioOpts('status',[['Active — loaded and stable','✅ Active & stable'],['Passive — inserted, not yet loaded','🔵 Passive'],['Treatment objective achieved — to be removed','🏁 Objective achieved'],['Failed — removed and replaced','❌ Failed — replaced'],['Removed — treatment complete','✂️ Removed']],sc.status)}
-        </div></div>
-        <div class="field"><label>Peri-implant Tissue</label><div class="toggle-group">
-          ${radioOpts('tissue',[['Healthy — no inflammation','✅ Healthy'],['Mild inflammation — OH reinforced','⚠️ Mild'],['Moderate inflammation — chlorhexidine prescribed','🔴 Moderate — CHX'],['Hyperplastic tissue — surgical review needed','❌ Hyperplastic']],sc.tissue)}
-        </div></div>
-      </div>
-
     </div>
   </div>`;
 
@@ -4808,8 +4946,6 @@ function tadCollectScrew(idx) {
   sc.forceMag       = rv(fn('forceMag'));
   sc.forceDir       = rv(fn('forceDir'));
   sc.loadingNotes   = document.getElementById(fid('loadingNotes'))?.value||'';
-  sc.status         = rv(fn('status'));
-  sc.tissue         = rv(fn('tissue'));
 }
 
 function buildTadSummary() {
@@ -4844,7 +4980,6 @@ function buildTadSummary() {
       b('Force type', sc.forceType); b('Force magnitude', sc.forceMag); b('Force direction', sc.forceDir);
     }
     b('Loading notes', sc.loadingNotes);
-    b('TAD status', sc.status); b('Peri-implant tissue', sc.tissue);
   });
   s('Session Follow-Up');
   b('N.V.',get('tad-nv')); b('Referral',get('tad-referral'));
@@ -4855,6 +4990,13 @@ function buildTadSummary() {
 
 // Stubs kept for compatibility
 function updateTadJaw(){} function updateTadSiteDetail(){} function updateTadMandSiteDetail(){} function updateTadLoading(){}
+
+// ── TAD Status toggle in follow-up tabs ──────────────────────────────
+function toggleTadStatus(prefix) {
+  const cb   = document.getElementById(prefix + '-has-tad');
+  const wrap = document.getElementById(prefix + '-tad-status-wrap');
+  if (wrap) wrap.style.display = cb?.checked ? '' : 'none';
+}
 
 // ── Listen for admin changes (when admin panel is open in another tab) ─
 window.addEventListener('storage', e => {
