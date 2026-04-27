@@ -579,6 +579,9 @@
     <button class="tab-btn" onclick="switchTab('fu-aligner')" id="tbtn-fu-aligner">
       <span class="tab-icon">💎</span> Aligner Follow-Up<span class="unsaved-dot"></span>
     </button>
+    <button class="tab-btn" onclick="switchTab('fu-gmd')" id="tbtn-fu-gmd">
+      <span class="tab-icon">🌱</span> GMD Follow-Up<span class="unsaved-dot"></span>
+    </button>
     <button class="tab-btn" onclick="switchTab('emergency')" id="tbtn-emergency">
       <span class="tab-icon">🚨</span> Emergency<span class="unsaved-dot"></span>
     </button>
@@ -1199,7 +1202,7 @@
       <span class="chevron">▼</span>
     </div>
     <div class="section-body">
-      <div class="appliance-cards">
+      <div class="appliance-cards" style="grid-template-columns:1fr 1fr 1fr;">
         <label class="appliance-card" id="card-fixed">
           <input type="radio" name="plan-appliance-type" value="fixed" onchange="updateApplianceCard()">
           <div class="appliance-card-icon">🔩</div>
@@ -1210,7 +1213,355 @@
           <div class="appliance-card-icon">💎</div>
           <div class="appliance-card-text"><strong>Clear Aligners</strong><span>Aligner therapy system</span></div>
         </label>
+        <label class="appliance-card" id="card-gmd">
+          <input type="radio" name="plan-appliance-type" value="gmd" onchange="updateApplianceCard()">
+          <div class="appliance-card-icon">🌱</div>
+          <div class="appliance-card-text"><strong>Growth Modification</strong><span>Functional / Headgear</span></div>
+        </label>
       </div>
+
+      <!-- ── GMD FIELDS (Sections 1–4) ── -->
+      <div id="plan-gmd-fields" style="display:none;">
+
+        <!-- §1 Appliance Type -->
+        <div class="sub-title" style="margin-top:6px;color:#1a5c3a;">🌱 §1 — Appliance Type</div>
+
+        <!-- Category selector -->
+        <div class="field">
+          <label>Appliance Category</label>
+          <div class="toggle-group">
+            <label><input type="radio" name="gmd-category" value="functional-removable" onchange="updateGmdCategory()"><span>🔄 Functional Removable</span></label>
+            <label><input type="radio" name="gmd-category" value="functional-fixed" onchange="updateGmdCategory()"><span>🔗 Functional Fixed</span></label>
+            <label><input type="radio" name="gmd-category" value="headgear" onchange="updateGmdCategory()"><span>🎯 Headgear</span></label>
+          </div>
+        </div>
+
+        <!-- Functional Removable -->
+        <div id="gmd-removable-wrap" style="display:none;">
+          <div class="field">
+            <label>Appliance</label>
+            <div class="toggle-group">
+              <label><input type="radio" name="gmd-removable-type" value="Twin Block"><span>Twin Block</span></label>
+              <label><input type="radio" name="gmd-removable-type" value="Bionator"><span>Bionator</span></label>
+              <label><input type="radio" name="gmd-removable-type" value="Activator / ACCO"><span>Activator / ACCO</span></label>
+              <label><input type="radio" name="gmd-removable-type" value="Frankel FR-II"><span>Frankel FR-II</span></label>
+              <label><input type="radio" name="gmd-removable-type" value="Frankel FR-III"><span>Frankel FR-III</span></label>
+              <label><input type="radio" name="gmd-removable-type" value="Modified Twin Block"><span>Modified Twin Block</span></label>
+              <label><input type="radio" name="gmd-removable-type" value="Myofunctional appliance"><span>Myofunctional</span></label>
+              <label><input type="radio" name="gmd-removable-type" value="Upper Removable Appliance (URA)"><span>URA</span></label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Functional Fixed -->
+        <div id="gmd-fixed-wrap" style="display:none;">
+          <div class="field">
+            <label>Appliance</label>
+            <div class="toggle-group">
+              <label><input type="radio" name="gmd-fixed-type" value="Herbst"><span>Herbst</span></label>
+              <label><input type="radio" name="gmd-fixed-type" value="Forsus"><span>Forsus</span></label>
+              <label><input type="radio" name="gmd-fixed-type" value="Jasper Jumper"><span>Jasper Jumper</span></label>
+              <label><input type="radio" name="gmd-fixed-type" value="MARA"><span>MARA</span></label>
+              <label><input type="radio" name="gmd-fixed-type" value="Sabbagh Universal Spring (SUS)"><span>SUS</span></label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Headgear -->
+        <div id="gmd-headgear-wrap" style="display:none;">
+          <div class="field">
+            <label>Headgear Type</label>
+            <div class="toggle-group">
+              <label><input type="radio" name="gmd-hg-type" value="Cervical-pull headgear"><span>Cervical-pull</span></label>
+              <label><input type="radio" name="gmd-hg-type" value="High-pull headgear"><span>High-pull</span></label>
+              <label><input type="radio" name="gmd-hg-type" value="Straight-pull (Combination) headgear"><span>Straight-pull (Combination)</span></label>
+              <label><input type="radio" name="gmd-hg-type" value="Face mask / Reverse-pull (Class III)"><span>Face mask / Reverse-pull</span></label>
+              <label><input type="radio" name="gmd-hg-type" value="Chin cup"><span>Chin cup</span></label>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="field">
+              <label>Attachment</label>
+              <div class="toggle-group">
+                <label><input type="radio" name="gmd-hg-attach" value="Molar bands"><span>Molar bands</span></label>
+                <label><input type="radio" name="gmd-hg-attach" value="Facebow to molar tubes"><span>Facebow to molar tubes</span></label>
+                <label><input type="radio" name="gmd-hg-attach" value="Bonded hooks"><span>Bonded hooks</span></label>
+                <label><input type="radio" name="gmd-hg-attach" value="Splint / removable plate"><span>Splint / removable plate</span></label>
+              </div>
+            </div>
+            <div class="field">
+              <label>Force Direction Goal</label>
+              <div class="toggle-group">
+                <label><input type="radio" name="gmd-hg-direction" value="Distal (restrict maxillary growth)"><span>Distal — restrict maxilla</span></label>
+                <label><input type="radio" name="gmd-hg-direction" value="Intrusive + distal (high-pull)"><span>Intrusive + distal</span></label>
+                <label><input type="radio" name="gmd-hg-direction" value="Protract maxilla (face mask)"><span>Protract maxilla</span></label>
+                <label><input type="radio" name="gmd-hg-direction" value="Restrict mandible (chin cup)"><span>Restrict mandible</span></label>
+              </div>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="field">
+              <label>Prescribed Force</label>
+              <div class="toggle-group">
+                <label><input type="radio" name="gmd-hg-force" value="200–300 g (light)"><span>200–300 g</span></label>
+                <label><input type="radio" name="gmd-hg-force" value="300–400 g (moderate)"><span>300–400 g</span></label>
+                <label><input type="radio" name="gmd-hg-force" value="400–500 g (heavy)"><span>400–500 g</span></label>
+                <label><input type="radio" name="gmd-hg-force" value="500–600 g (face mask)"><span>500–600 g</span></label>
+              </div>
+            </div>
+            <div class="field">
+              <label>Prescribed Wear Time</label>
+              <div class="toggle-group">
+                <label><input type="radio" name="gmd-hg-wear" value="12–14 hrs/day"><span>12–14 hrs/day</span></label>
+                <label><input type="radio" name="gmd-hg-wear" value="14–16 hrs/day"><span>14–16 hrs/day</span></label>
+                <label><input type="radio" name="gmd-hg-wear" value="16 hrs/day"><span>16 hrs/day</span></label>
+                <label><input type="radio" name="gmd-hg-wear" value="Full-time (22 hrs/day)"><span>Full-time 22 hrs</span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- §2 Skeletal Maturity -->
+        <div class="sub-title" style="margin-top:8px;color:#1a5c3a;">🦴 §2 — Skeletal Maturity</div>
+        <div class="grid-2">
+          <div class="field">
+            <label>Cervical Vertebrae Stage (CS)</label>
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <label style="display:flex;align-items:flex-start;gap:8px;padding:6px 10px;border:1.5px solid var(--grey-200);border-radius:8px;cursor:pointer;transition:all .15s;" id="cs-lbl-1">
+                <input type="radio" name="gmd-cs-stage" value="CS1" onchange="highlightCS()" style="margin-top:2px;flex-shrink:0;">
+                <span><strong>CS1</strong> — C2, C3, C4 inferior borders flat. Peak growth ≥2 yrs away.</span>
+              </label>
+              <label style="display:flex;align-items:flex-start;gap:8px;padding:6px 10px;border:1.5px solid var(--grey-200);border-radius:8px;cursor:pointer;transition:all .15s;" id="cs-lbl-2">
+                <input type="radio" name="gmd-cs-stage" value="CS2" onchange="highlightCS()" style="margin-top:2px;flex-shrink:0;">
+                <span><strong>CS2</strong> — C2, C3 concavity present. Peak growth ~1 yr away.</span>
+              </label>
+              <label style="display:flex;align-items:flex-start;gap:8px;padding:6px 10px;border:1.5px solid var(--grey-200);border-radius:8px;cursor:pointer;transition:all .15s;" id="cs-lbl-3">
+                <input type="radio" name="gmd-cs-stage" value="CS3" onchange="highlightCS()" style="margin-top:2px;flex-shrink:0;">
+                <span><strong>CS3</strong> — C2, C3, C4 concavities. Rapid growth occurring now (within 1 yr).</span>
+              </label>
+              <label style="display:flex;align-items:flex-start;gap:8px;padding:6px 10px;border:1.5px solid var(--grey-200);border-radius:8px;cursor:pointer;transition:all .15s;" id="cs-lbl-4">
+                <input type="radio" name="gmd-cs-stage" value="CS4" onchange="highlightCS()" style="margin-top:2px;flex-shrink:0;">
+                <span><strong>CS4</strong> — C2, C3, C4 concave. C3/C4 rectangular horiz. Peak growth 1–2 yrs ago.</span>
+              </label>
+              <label style="display:flex;align-items:flex-start;gap:8px;padding:6px 10px;border:1.5px solid var(--grey-200);border-radius:8px;cursor:pointer;transition:all .15s;" id="cs-lbl-5">
+                <input type="radio" name="gmd-cs-stage" value="CS5" onchange="highlightCS()" style="margin-top:2px;flex-shrink:0;">
+                <span><strong>CS5</strong> — C3/C4 square. Growth nearly complete (&gt;2 yrs after peak).</span>
+              </label>
+              <label style="display:flex;align-items:flex-start;gap:8px;padding:6px 10px;border:1.5px solid var(--grey-200);border-radius:8px;cursor:pointer;transition:all .15s;" id="cs-lbl-6">
+                <input type="radio" name="gmd-cs-stage" value="CS6" onchange="highlightCS()" style="margin-top:2px;flex-shrink:0;">
+                <span><strong>CS6</strong> — C3/C4 rectangular vertical. Growth complete.</span>
+              </label>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div class="field">
+              <label>Growth Status</label>
+              <div class="toggle-group">
+                <label><input type="radio" name="gmd-growth-status" value="Pre-peak — good potential"><span>🟢 Pre-peak — good potential</span></label>
+                <label><input type="radio" name="gmd-growth-status" value="Peak — ideal timing"><span>🔥 Peak — ideal timing</span></label>
+                <label><input type="radio" name="gmd-growth-status" value="Post-peak — reduced potential"><span>🟡 Post-peak — reduced</span></label>
+                <label><input type="radio" name="gmd-growth-status" value="Growth complete — camouflage or surgery"><span>🔴 Complete — camouflage/surgery</span></label>
+              </div>
+            </div>
+            <div class="field">
+              <label>Skeletal Classification</label>
+              <div class="toggle-group">
+                <label><input type="radio" name="gmd-skeletal-class" value="Skeletal Class II — mandibular retrusion"><span>Class II — mandibular retrusion</span></label>
+                <label><input type="radio" name="gmd-skeletal-class" value="Skeletal Class II — maxillary protrusion"><span>Class II — maxillary protrusion</span></label>
+                <label><input type="radio" name="gmd-skeletal-class" value="Skeletal Class III — mandibular protrusion"><span>Class III — mandibular protrusion</span></label>
+                <label><input type="radio" name="gmd-skeletal-class" value="Skeletal Class III — maxillary retrusion"><span>Class III — maxillary retrusion</span></label>
+              </div>
+            </div>
+            <div class="field">
+              <label>Vertical Pattern</label>
+              <div class="toggle-group">
+                <label><input type="radio" name="gmd-vert-pattern" value="Normodivergent"><span>Normodivergent</span></label>
+                <label><input type="radio" name="gmd-vert-pattern" value="Hyperdivergent"><span>Hyperdivergent</span></label>
+                <label><input type="radio" name="gmd-vert-pattern" value="Hypodivergent"><span>Hypodivergent</span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- §3 Baseline Records -->
+        <div class="sub-title" style="margin-top:8px;color:#1a5c3a;">📏 §3 — Baseline Records (at start)</div>
+        <div style="background:var(--green-light);border:1px solid #a5d6a7;border-radius:9px;padding:12px 14px;">
+          <div style="font-size:0.72rem;color:var(--green);font-weight:600;margin-bottom:10px;">These values are your reference — progress will be calculated against them in follow-up visits.</div>
+          <div class="grid-3">
+            <div class="field">
+              <label>Overjet at Start (mm)</label>
+              <input type="number" id="gmd-base-oj" placeholder="e.g. 9" step="0.5" min="0" max="30">
+            </div>
+            <div class="field">
+              <label>Overbite at Start (mm)</label>
+              <input type="number" id="gmd-base-ob" placeholder="e.g. 5" step="0.5" min="-10" max="20">
+            </div>
+            <div class="field">
+              <label>Lower Face Height (mm)</label>
+              <input type="number" id="gmd-base-lfh" placeholder="e.g. 68" step="1">
+            </div>
+          </div>
+          <div class="grid-2" style="margin-top:8px;">
+            <div class="field">
+              <label>Molar Relation — Right</label>
+              <div class="toggle-group">
+                <label><input type="radio" name="gmd-base-molar-r" value="Full Class II"><span>Full Class II</span></label>
+                <label><input type="radio" name="gmd-base-molar-r" value="½ Class II"><span>½ Class II</span></label>
+                <label><input type="radio" name="gmd-base-molar-r" value="Class I"><span>Class I</span></label>
+                <label><input type="radio" name="gmd-base-molar-r" value="½ Class III"><span>½ Class III</span></label>
+                <label><input type="radio" name="gmd-base-molar-r" value="Full Class III"><span>Full Class III</span></label>
+              </div>
+            </div>
+            <div class="field">
+              <label>Molar Relation — Left</label>
+              <div class="toggle-group">
+                <label><input type="radio" name="gmd-base-molar-l" value="Full Class II"><span>Full Class II</span></label>
+                <label><input type="radio" name="gmd-base-molar-l" value="½ Class II"><span>½ Class II</span></label>
+                <label><input type="radio" name="gmd-base-molar-l" value="Class I"><span>Class I</span></label>
+                <label><input type="radio" name="gmd-base-molar-l" value="½ Class III"><span>½ Class III</span></label>
+                <label><input type="radio" name="gmd-base-molar-l" value="Full Class III"><span>Full Class III</span></label>
+              </div>
+            </div>
+          </div>
+          <div class="grid-2" style="margin-top:8px;">
+            <div class="field">
+              <label>Canine Relation — Right</label>
+              <div class="toggle-group">
+                <label><input type="radio" name="gmd-base-canine-r" value="Class I"><span>Class I</span></label>
+                <label><input type="radio" name="gmd-base-canine-r" value="Class II"><span>Class II</span></label>
+                <label><input type="radio" name="gmd-base-canine-r" value="Class III"><span>Class III</span></label>
+              </div>
+            </div>
+            <div class="field">
+              <label>Canine Relation — Left</label>
+              <div class="toggle-group">
+                <label><input type="radio" name="gmd-base-canine-l" value="Class I"><span>Class I</span></label>
+                <label><input type="radio" name="gmd-base-canine-l" value="Class II"><span>Class II</span></label>
+                <label><input type="radio" name="gmd-base-canine-l" value="Class III"><span>Class III</span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- §4 Appliance Details -->
+        <div class="sub-title" style="margin-top:8px;color:#1a5c3a;">⚙️ §4 — Appliance Details</div>
+
+        <!-- Twin Block specific -->
+        <div id="gmd-detail-twinblock" style="display:none;">
+          <div style="background:var(--grey-50);border:1.5px solid var(--grey-200);border-radius:9px;padding:12px 14px;display:grid;gap:10px;">
+            <div class="grid-3">
+              <div class="field">
+                <label>Mandibular Advancement (mm)</label>
+                <input type="number" id="gmd-tb-advance" placeholder="e.g. 7" step="0.5" min="0" max="15">
+              </div>
+              <div class="field">
+                <label>Vertical Opening (mm)</label>
+                <input type="number" id="gmd-tb-vertical" placeholder="e.g. 4" step="0.5" min="0" max="15">
+              </div>
+              <div class="field">
+                <label>Midline at Bite Registration</label>
+                <div class="toggle-group">
+                  <label><input type="radio" name="gmd-tb-midline" value="Coincident"><span>Coincident</span></label>
+                  <label><input type="radio" name="gmd-tb-midline" value="Corrected to coincident"><span>Corrected</span></label>
+                </div>
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="field">
+                <label>Upper Plate</label>
+                <div class="toggle-group">
+                  <label><input type="checkbox" id="gmd-tb-exp-screw"><span>Expansion screw</span></label>
+                  <label><input type="checkbox" id="gmd-tb-labial-bow"><span>Labial bow</span></label>
+                  <label><input type="checkbox" id="gmd-tb-clasps"><span>Adams clasps</span></label>
+                  <label><input type="checkbox" id="gmd-tb-upper-bite-block"><span>Upper bite block</span></label>
+                </div>
+              </div>
+              <div class="field">
+                <label>Lower Plate</label>
+                <div class="toggle-group">
+                  <label><input type="checkbox" id="gmd-tb-lower-bite-block"><span>Lower bite block</span></label>
+                  <label><input type="checkbox" id="gmd-tb-lower-labial"><span>Labial bow</span></label>
+                  <label><input type="checkbox" id="gmd-tb-lower-clasps"><span>Ball clasps</span></label>
+                </div>
+              </div>
+            </div>
+            <div class="field">
+              <label>Wear Instructions</label>
+              <div class="toggle-group">
+                <label><input type="radio" name="gmd-tb-wear" value="Full-time including eating (22 hrs)"><span>Full-time incl. eating</span></label>
+                <label><input type="radio" name="gmd-tb-wear" value="Full-time except eating (20 hrs)"><span>Full-time excl. eating</span></label>
+                <label><input type="radio" name="gmd-tb-wear" value="Sleep + school hours"><span>Sleep + school</span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Herbst / Forsus specific -->
+        <div id="gmd-detail-herbst" style="display:none;">
+          <div style="background:var(--grey-50);border:1.5px solid var(--grey-200);border-radius:9px;padding:12px 14px;display:grid;gap:10px;">
+            <div class="grid-3">
+              <div class="field">
+                <label>Rod Length</label>
+                <input type="text" id="gmd-herbst-rod" placeholder="e.g. 26 mm Right / 27 mm Left">
+              </div>
+              <div class="field">
+                <label>Initial Advancement</label>
+                <input type="number" id="gmd-herbst-advance" placeholder="mm" step="1" min="0" max="15">
+              </div>
+              <div class="field">
+                <label>Side</label>
+                <div class="toggle-group">
+                  <label><input type="radio" name="gmd-herbst-side" value="Bilateral"><span>Bilateral</span></label>
+                  <label><input type="radio" name="gmd-herbst-side" value="Unilateral — Right"><span>Unilateral R</span></label>
+                  <label><input type="radio" name="gmd-herbst-side" value="Unilateral — Left"><span>Unilateral L</span></label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Generic removable detail (non-Twin Block) -->
+        <div id="gmd-detail-generic-removable" style="display:none;">
+          <div style="background:var(--grey-50);border:1.5px solid var(--grey-200);border-radius:9px;padding:12px 14px;display:grid;gap:10px;">
+            <div class="grid-2">
+              <div class="field">
+                <label>Wear Instructions</label>
+                <div class="toggle-group">
+                  <label><input type="radio" name="gmd-generic-wear" value="Full-time (22 hrs/day)"><span>Full-time 22 hrs</span></label>
+                  <label><input type="radio" name="gmd-generic-wear" value="14–16 hrs/day"><span>14–16 hrs</span></label>
+                  <label><input type="radio" name="gmd-generic-wear" value="Night-time only"><span>Night-time only</span></label>
+                </div>
+              </div>
+              <div class="field">
+                <label>Appliance Notes</label>
+                <textarea id="gmd-generic-notes" placeholder="Specific instructions, modifications, activation..."></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phase & Goals -->
+        <div class="grid-2" style="margin-top:4px;">
+          <div class="field">
+            <label>Treatment Phase</label>
+            <div class="toggle-group">
+              <label><input type="radio" name="gmd-phase" value="Phase I only — then review"><span>Phase I only</span></label>
+              <label><input type="radio" name="gmd-phase" value="Phase I → Phase II fixed appliance"><span>Phase I → Fixed</span></label>
+              <label><input type="radio" name="gmd-phase" value="Phase I → Phase II aligner"><span>Phase I → Aligner</span></label>
+              <label><input type="radio" name="gmd-phase" value="Standalone growth modification"><span>Standalone</span></label>
+            </div>
+          </div>
+          <div class="field">
+            <label>Estimated Duration</label>
+            <input type="text" id="gmd-duration" placeholder="e.g. 12–18 months">
+          </div>
+        </div>
+        <div class="field">
+          <label>Treatment Goals</label>
+          <textarea id="gmd-goals" placeholder="Specific skeletal and dental objectives..."></textarea>
+        </div>
+
+      </div><!-- /plan-gmd-fields -->
       <div id="plan-fixed-fields">
         <div class="sub-title" style="margin-top:4px;">Fixed Appliance Details</div>
         <div class="grid-3">
@@ -2437,6 +2788,276 @@
 
 
 <!-- ═══════════════════════════════════════════════
+     TAB 6: GMD FOLLOW-UP
+═══════════════════════════════════════════════ -->
+<div class="tab-panel" id="panel-fu-gmd">
+  <div class="patient-bar">
+    <div class="field"><label>Patient Name</label><input type="text" id="fug-name" placeholder="Full name"></div>
+    <div class="field"><label>Visit #</label><input type="number" id="fug-visit-no" placeholder="e.g. 2" min="1"></div>
+    <div class="field"><label>Clinician</label><input type="text" id="fug-clinician" placeholder="Dr. ..."></div>
+    <div class="visit-date-box"><label>Date</label><input type="date" id="fug-date"></div>
+  </div>
+
+  <!-- Appliance reminder bar -->
+  <div style="background:var(--navy);border-radius:10px;padding:10px 16px;margin-bottom:10px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+    <span style="color:var(--teal-mid);font-size:0.78rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;">Appliance in use</span>
+    <div class="toggle-group" style="flex-wrap:wrap;">
+      <label><input type="radio" name="fug-appliance-reminder" value="Twin Block"><span>Twin Block</span></label>
+      <label><input type="radio" name="fug-appliance-reminder" value="Bionator"><span>Bionator</span></label>
+      <label><input type="radio" name="fug-appliance-reminder" value="Activator / ACCO"><span>Activator</span></label>
+      <label><input type="radio" name="fug-appliance-reminder" value="Frankel FR-II"><span>FR-II</span></label>
+      <label><input type="radio" name="fug-appliance-reminder" value="Frankel FR-III"><span>FR-III</span></label>
+      <label><input type="radio" name="fug-appliance-reminder" value="Herbst"><span>Herbst</span></label>
+      <label><input type="radio" name="fug-appliance-reminder" value="Forsus"><span>Forsus</span></label>
+      <label><input type="radio" name="fug-appliance-reminder" value="Cervical-pull headgear"><span>Cervical HG</span></label>
+      <label><input type="radio" name="fug-appliance-reminder" value="High-pull headgear"><span>High-pull HG</span></label>
+      <label><input type="radio" name="fug-appliance-reminder" value="Face mask / Reverse-pull"><span>Face mask</span></label>
+      <label><input type="radio" name="fug-appliance-reminder" value="Chin cup"><span>Chin cup</span></label>
+    </div>
+  </div>
+
+  <!-- §5 Progress Assessment -->
+  <div class="section-card" id="fug-sec-progress">
+    <div class="section-header" onclick="toggleSection('fug-sec-progress')">
+      <div class="section-icon" style="background:var(--green);">📊</div>
+      <div class="section-title">§5 — Visit Progress Assessment</div>
+      <div class="section-badge" style="background:var(--green-light);color:var(--green);border-color:#a5d6a7;">Core</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+
+      <!-- Compliance -->
+      <div class="sub-title" style="color:var(--green);">👤 Compliance</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Wear Compliance</label>
+          <div class="toggle-group">
+            <label><input type="radio" name="fug-compliance" value="Excellent — wearing as prescribed"><span>✅ Excellent</span></label>
+            <label><input type="radio" name="fug-compliance" value="Good — minor lapses"><span>👍 Good</span></label>
+            <label><input type="radio" name="fug-compliance" value="Fair — wearing &lt;12 hrs/day"><span>⚠️ Fair &lt;12 hrs</span></label>
+            <label><input type="radio" name="fug-compliance" value="Poor — rarely wearing"><span>❌ Poor</span></label>
+            <label><input type="radio" name="fug-compliance" value="Not wearing at all"><span>🚫 Not wearing</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Patient Reported Wear (hrs/day)</label>
+          <input type="number" id="fug-wear-hrs" placeholder="e.g. 14" min="0" max="24" step="1">
+          <div class="field" style="margin-top:8px;">
+            <label>Patient Comfort</label>
+            <div class="toggle-group">
+              <label><input type="radio" name="fug-comfort" value="Comfortable"><span>😊 Comfortable</span></label>
+              <label><input type="radio" name="fug-comfort" value="Mild discomfort"><span>😐 Mild discomfort</span></label>
+              <label><input type="radio" name="fug-comfort" value="Painful — adjustment needed"><span>😣 Painful</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Measurements this visit -->
+      <div class="sub-title" style="color:var(--green);margin-top:4px;">📏 Measurements This Visit</div>
+      <div style="background:var(--green-light);border:1px solid #a5d6a7;border-radius:9px;padding:12px 14px;">
+        <div style="font-size:0.72rem;color:var(--green);font-weight:600;margin-bottom:10px;">Record baseline in Treatment Plan tab — change is calculated automatically below.</div>
+        <div class="grid-3">
+          <div class="field">
+            <label>Overjet Now (mm)</label>
+            <input type="number" id="fug-oj-now" placeholder="e.g. 5" step="0.5" min="0" max="30" oninput="calcGmdChange()">
+            <div id="fug-oj-change" style="font-size:0.74rem;font-weight:700;margin-top:4px;color:var(--green);"></div>
+          </div>
+          <div class="field">
+            <label>Overbite Now (mm)</label>
+            <input type="number" id="fug-ob-now" placeholder="e.g. 3" step="0.5" min="-10" max="20" oninput="calcGmdChange()">
+            <div id="fug-ob-change" style="font-size:0.74rem;font-weight:700;margin-top:4px;color:var(--green);"></div>
+          </div>
+          <div class="field">
+            <label>Lower Face Height Now (mm)</label>
+            <input type="number" id="fug-lfh-now" placeholder="e.g. 70" step="1" oninput="calcGmdChange()">
+            <div id="fug-lfh-change" style="font-size:0.74rem;font-weight:700;margin-top:4px;color:var(--teal);"></div>
+          </div>
+        </div>
+        <div class="grid-2" style="margin-top:8px;">
+          <div class="field">
+            <label>Molar Relation — Right</label>
+            <div class="toggle-group">
+              <label><input type="radio" name="fug-molar-r" value="Full Class II"><span>Full Class II</span></label>
+              <label><input type="radio" name="fug-molar-r" value="½ Class II"><span>½ Class II</span></label>
+              <label><input type="radio" name="fug-molar-r" value="Class I"><span>Class I</span></label>
+              <label><input type="radio" name="fug-molar-r" value="½ Class III"><span>½ Class III</span></label>
+              <label><input type="radio" name="fug-molar-r" value="Full Class III"><span>Full Class III</span></label>
+            </div>
+          </div>
+          <div class="field">
+            <label>Molar Relation — Left</label>
+            <div class="toggle-group">
+              <label><input type="radio" name="fug-molar-l" value="Full Class II"><span>Full Class II</span></label>
+              <label><input type="radio" name="fug-molar-l" value="½ Class II"><span>½ Class II</span></label>
+              <label><input type="radio" name="fug-molar-l" value="Class I"><span>Class I</span></label>
+              <label><input type="radio" name="fug-molar-l" value="½ Class III"><span>½ Class III</span></label>
+              <label><input type="radio" name="fug-molar-l" value="Full Class III"><span>Full Class III</span></label>
+            </div>
+          </div>
+        </div>
+        <div class="grid-2" style="margin-top:8px;">
+          <div class="field">
+            <label>Canine Relation — Right</label>
+            <div class="toggle-group">
+              <label><input type="radio" name="fug-canine-r" value="Class I"><span>Class I</span></label>
+              <label><input type="radio" name="fug-canine-r" value="Class II"><span>Class II</span></label>
+              <label><input type="radio" name="fug-canine-r" value="Class III"><span>Class III</span></label>
+            </div>
+          </div>
+          <div class="field">
+            <label>Canine Relation — Left</label>
+            <div class="toggle-group">
+              <label><input type="radio" name="fug-canine-l" value="Class I"><span>Class I</span></label>
+              <label><input type="radio" name="fug-canine-l" value="Class II"><span>Class II</span></label>
+              <label><input type="radio" name="fug-canine-l" value="Class III"><span>Class III</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Clinical assessment -->
+      <div class="sub-title" style="color:var(--green);margin-top:4px;">🔍 Clinical Assessment</div>
+      <div class="grid-3">
+        <div class="field">
+          <label>Skeletal Response</label>
+          <div class="toggle-group">
+            <label><input type="radio" name="fug-skeletal-resp" value="Good skeletal response"><span>✅ Good skeletal</span></label>
+            <label><input type="radio" name="fug-skeletal-resp" value="Predominantly dental response"><span>⚠️ Mainly dental</span></label>
+            <label><input type="radio" name="fug-skeletal-resp" value="Mixed skeletal + dental"><span>Mixed</span></label>
+            <label><input type="radio" name="fug-skeletal-resp" value="Minimal response — review plan"><span>❌ Minimal</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Soft Tissue Response</label>
+          <div class="toggle-group">
+            <label><input type="radio" name="fug-soft-tissue" value="Improving — lip position improving"><span>✅ Improving</span></label>
+            <label><input type="radio" name="fug-soft-tissue" value="Static — no change yet"><span>⏸ Static</span></label>
+            <label><input type="radio" name="fug-soft-tissue" value="Regressed"><span>❌ Regressed</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Overall Progress</label>
+          <div class="toggle-group">
+            <label><input type="radio" name="fug-overall" value="On track — progressing well"><span>✅ On track</span></label>
+            <label><input type="radio" name="fug-overall" value="Slower than expected — monitor"><span>⚠️ Slower</span></label>
+            <label><input type="radio" name="fug-overall" value="Plateau — intervention needed"><span>🔴 Plateau</span></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Adjustments this visit -->
+      <div class="sub-title" style="color:var(--green);margin-top:4px;">🔧 Adjustments This Visit</div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Action Performed</label>
+          <div class="toggle-group">
+            <label><input type="checkbox" id="fug-adj-trim"><span>Trim bite block</span></label>
+            <label><input type="checkbox" id="fug-adj-activate"><span>Activate expansion screw</span></label>
+            <label><input type="checkbox" id="fug-adj-advance"><span>Advance rod (Herbst/Forsus)</span></label>
+            <label><input type="checkbox" id="fug-adj-new-bite"><span>New bite registration</span></label>
+            <label><input type="checkbox" id="fug-adj-repair"><span>Repair appliance</span></label>
+            <label><input type="checkbox" id="fug-adj-polish"><span>Polish / Smooth</span></label>
+            <label><input type="checkbox" id="fug-adj-hg-force"><span>Adjust HG force</span></label>
+            <label><input type="checkbox" id="fug-adj-replace"><span>Replace broken component</span></label>
+            <label><input type="checkbox" id="fug-adj-none"><span>No adjustment</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Adjustment Details</label>
+          <textarea id="fug-adj-notes" placeholder="e.g. Trimmed 1mm upper bite block to encourage forward posture / Activated expansion screw 2 turns..."></textarea>
+        </div>
+      </div>
+      <div class="field">
+        <label>Oral Hygiene</label>
+        <div class="toggle-group">
+          <label><input type="radio" name="fug-oh" value="Good"><span>✅ Good</span></label>
+          <label><input type="radio" name="fug-oh" value="Fair"><span>⚠️ Fair</span></label>
+          <label><input type="radio" name="fug-oh" value="Poor — reinforced"><span>❌ Poor — reinforced</span></label>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- §6 Transition Decision -->
+  <div class="section-card" id="fug-sec-transition">
+    <div class="section-header" onclick="toggleSection('fug-sec-transition')">
+      <div class="section-icon gold">🔀</div>
+      <div class="section-title">§6 — Transition Decision</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="grid-2">
+        <div class="field">
+          <label>Decision This Visit</label>
+          <div class="toggle-group">
+            <label><input type="radio" name="fug-decision" value="Continue GMD — objectives not yet achieved" onchange="updateGmdDecision()"><span>🔄 Continue GMD</span></label>
+            <label><input type="radio" name="fug-decision" value="Overcorrection phase — continue GMD" onchange="updateGmdDecision()"><span>➕ Overcorrection phase</span></label>
+            <label><input type="radio" name="fug-decision" value="Phase I complete — transition to fixed appliance" onchange="updateGmdDecision()"><span>🔩 → Fixed braces</span></label>
+            <label><input type="radio" name="fug-decision" value="Phase I complete — transition to clear aligners" onchange="updateGmdDecision()"><span>💎 → Clear aligners</span></label>
+            <label><input type="radio" name="fug-decision" value="Phase I complete — retention / review only" onchange="updateGmdDecision()"><span>✅ → Retention / review</span></label>
+            <label><input type="radio" name="fug-decision" value="Discontinue — non-compliance" onchange="updateGmdDecision()"><span>🚫 Discontinue</span></label>
+            <label><input type="radio" name="fug-decision" value="Refer — surgical option to be discussed" onchange="updateGmdDecision()"><span>🏥 Refer — surgical</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Objectives Achieved</label>
+          <div class="toggle-group">
+            <label><input type="checkbox" id="fug-obj-oj"><span>OJ corrected</span></label>
+            <label><input type="checkbox" id="fug-obj-molar"><span>Molar Class I achieved</span></label>
+            <label><input type="checkbox" id="fug-obj-canine"><span>Canine Class I achieved</span></label>
+            <label><input type="checkbox" id="fug-obj-skeletal"><span>Skeletal improvement</span></label>
+            <label><input type="checkbox" id="fug-obj-soft"><span>Soft tissue improvement</span></label>
+            <label><input type="checkbox" id="fug-obj-vert"><span>Vertical control achieved</span></label>
+          </div>
+          <div class="field" style="margin-top:8px;">
+            <label>Phase I Duration (total)</label>
+            <input type="text" id="fug-phase-duration" placeholder="e.g. 14 months">
+          </div>
+        </div>
+      </div>
+
+      <!-- Transition detail — shown when transition selected -->
+      <div id="fug-transition-detail" style="display:none;margin-top:4px;">
+        <div style="background:var(--teal-light);border:1px solid var(--teal-mid);border-radius:9px;padding:12px 14px;">
+          <div style="font-size:0.76rem;font-weight:700;color:var(--teal);margin-bottom:8px;">Phase II Planning</div>
+          <div class="grid-2">
+            <div class="field">
+              <label>Phase II Start</label>
+              <div class="toggle-group">
+                <label><input type="radio" name="fug-phase2-start" value="Immediate — same appointment"><span>Immediate</span></label>
+                <label><input type="radio" name="fug-phase2-start" value="After 4–6 weeks retention"><span>After 4–6 wks retention</span></label>
+                <label><input type="radio" name="fug-phase2-start" value="After dental eruption"><span>After eruption</span></label>
+                <label><input type="radio" name="fug-phase2-start" value="To be confirmed"><span>TBC</span></label>
+              </div>
+            </div>
+            <div class="field">
+              <label>Interim Retention</label>
+              <div class="toggle-group">
+                <label><input type="checkbox" id="fug-ret-same"><span>Continue same appliance as retainer</span></label>
+                <label><input type="checkbox" id="fug-ret-vfr"><span>Fabricate VFR / Essix</span></label>
+                <label><input type="checkbox" id="fug-ret-hawley"><span>Fabricate Hawley</span></label>
+                <label><input type="checkbox" id="fug-ret-none"><span>No retention needed</span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top:10px;">
+        <div class="field"><label>Next Visit</label><textarea id="fug-nv" placeholder="e.g. 8 weeks — progress check / trim bite block"></textarea></div>
+        <div class="field"><label>Referral</label><textarea id="fug-referral" placeholder="e.g. Oral surgeon for orthognathic consultation..."></textarea></div>
+      </div>
+      <div class="aseptic-row"><input type="checkbox" id="fug-aseptic"><span>🛡️ Aseptic technique and appropriate PPE were maintained and observed throughout the entire procedure. Confirmed by Clinician.</span></div>
+      <div class="field"><label>Visit Notes</label><textarea id="fug-notes" class="notes-area" placeholder="Patient concerns, parents' observations, clinical findings..."></textarea></div>
+    </div>
+  </div>
+
+</div><!-- /panel-fu-gmd -->
+
+
+<!-- ═══════════════════════════════════════════════
      TAB 6: EMERGENCY VISIT
 ═══════════════════════════════════════════════ -->
 <div class="tab-panel" id="panel-emergency">
@@ -2935,10 +3556,15 @@ function getWireText(containerId, arch) {
 // ── Appliance card toggling ────────────────────────────────────────────
 function updateApplianceCard() {
   const val = document.querySelector('[name="plan-appliance-type"]:checked')?.value;
-  document.getElementById('plan-fixed-fields').style.display = val === 'fixed' ? '' : 'none';
-  document.getElementById('plan-aligner-fields').style.display = val === 'aligner' ? '' : 'none';
-  document.getElementById('card-fixed').classList.toggle('selected', val === 'fixed');
-  document.getElementById('card-aligner').classList.toggle('selected', val === 'aligner');
+  const pff = document.getElementById('plan-fixed-fields');
+  const paf = document.getElementById('plan-aligner-fields');
+  const pgf = document.getElementById('plan-gmd-fields');
+  if (pff) pff.style.display = val === 'fixed'   ? '' : 'none';
+  if (paf) paf.style.display = val === 'aligner' ? '' : 'none';
+  if (pgf) pgf.style.display = val === 'gmd'     ? '' : 'none';
+  document.getElementById('card-fixed')?.classList.toggle('selected',   val === 'fixed');
+  document.getElementById('card-aligner')?.classList.toggle('selected', val === 'aligner');
+  document.getElementById('card-gmd')?.classList.toggle('selected',     val === 'gmd');
 }
 
 function updateBondCard() {
@@ -3273,6 +3899,8 @@ function buildPlanSummary() {
     b('Arch coverage',radio('plan-arch-cov')); b('Bracket modification',get('plan-bracket-mod'));
   } else if(appType==='aligner'){
     b('System',get('plan-aligner-brand')); b('Scope',radio('plan-aligner-scope')); b('Est. aligners',get('plan-aligner-count'));
+  } else if(appType==='gmd'){
+    gmdPlanSummaryLines().forEach(line => L.push(line));
   }
   s('Anchorage & Extractions');
   b('Anchorage requirement',radio('plan-anch'));
@@ -3521,6 +4149,7 @@ function getCurrentSummary() {
     case 'bond':       return buildBondSummary();
     case 'fu-fixed':   return buildFuFixedSummary();
     case 'fu-aligner': return buildFuAlignerSummary();
+    case 'fu-gmd':     return buildFuGmdSummary();
     case 'emergency':  return buildEmergencySummary();
     case 'debond':     return buildDebondSummary();
     case 'tad':        return buildTadSummary();
@@ -3560,6 +4189,7 @@ const TAB_LABELS = {
   'bond':       'Bond-Up Visit',
   'fu-fixed':   'Fixed Follow-Up',
   'fu-aligner': 'Aligner Follow-Up',
+  'fu-gmd':     'GMD Follow-Up',
   'emergency':  'Emergency Visit',
   'debond':     'Debond & Retainer',
   'tad':        'TAD / Mini-screw',
@@ -3731,6 +4361,13 @@ function buildPrintSections() {
       } else if(appType==='aligner'){
         R('System', get('plan-aligner-brand')); R('Scope', radio('plan-aligner-scope'));
         R('Est. aligners', get('plan-aligner-count'));
+      } else if(appType==='gmd'){
+        gmdPlanSummaryLines().forEach(line => {
+          const trimmed = line.trim().replace(/^·\s*/,'');
+          const colonIdx = trimmed.indexOf(':');
+          if(colonIdx>0) R(trimmed.slice(0,colonIdx).trim(), trimmed.slice(colonIdx+1).trim());
+          else if(trimmed) RB(trimmed);
+        });
       }
       S('Anchorage & Extractions');
       R('Anchorage requirement', radio('plan-anch'));
@@ -4018,6 +4655,68 @@ function buildPrintSections() {
       R('Next visit', get('db-nv')); R('Referral', get('db-referral'));
       if(isChk('db-aseptic')) RA('Aseptic technique and appropriate PPE were maintained and observed throughout the entire procedure. Confirmed by Clinician.');
       R('Treatment summary', get('db-notes'));
+      break;
+    }
+
+    // ══════════════════════════════════════
+    case 'fu-gmd': {
+      S('Growth Modification Device Follow-Up');
+      R('Patient', get('fug-name')); R('Visit #', get('fug-visit-no'));
+      R('Date', get('fug-date')); R('Clinician', get('fug-clinician'));
+      R('Appliance', document.querySelector('[name="fug-appliance-reminder"]:checked')?.value||'');
+
+      S('§5 — Progress Assessment');
+      R('Compliance', radio('fug-compliance'));
+      R('Reported wear', get('fug-wear-hrs') ? get('fug-wear-hrs')+' hrs/day' : '');
+      R('Patient comfort', radio('fug-comfort'));
+
+      const ojNow  = get('fug-oj-now'),  baseOJp  = get('gmd-base-oj');
+      const obNow  = get('fug-ob-now'),  baseOBp  = get('gmd-base-ob');
+      const lfhNow = get('fug-lfh-now'), baseLFHp = get('gmd-base-lfh');
+      if(ojNow)  R('OJ now', ojNow+' mm'+(baseOJp?' (baseline '+baseOJp+' mm, change: '+parseFloat((baseOJp-ojNow).toFixed(1))+' mm)':''));
+      if(obNow)  R('OB now', obNow+' mm'+(baseOBp?' (baseline '+baseOBp+' mm, change: '+parseFloat((baseOBp-obNow).toFixed(1))+' mm)':''));
+      if(lfhNow) R('LFH now', lfhNow+' mm'+(baseLFHp?' (change: '+parseFloat((lfhNow-baseLFHp).toFixed(1))+' mm)':''));
+      R('Molar R', radio('fug-molar-r')); R('Molar L', radio('fug-molar-l'));
+      R('Canine R', radio('fug-canine-r')); R('Canine L', radio('fug-canine-l'));
+      R('Skeletal response', radio('fug-skeletal-resp'));
+      R('Soft tissue response', radio('fug-soft-tissue'));
+      R('Overall progress', radio('fug-overall'));
+
+      const adjs2=[];
+      if(isChk('fug-adj-trim'))adjs2.push('Trim bite block');
+      if(isChk('fug-adj-activate'))adjs2.push('Activate expansion screw');
+      if(isChk('fug-adj-advance'))adjs2.push('Advance rod');
+      if(isChk('fug-adj-new-bite'))adjs2.push('New bite registration');
+      if(isChk('fug-adj-repair'))adjs2.push('Repair appliance');
+      if(isChk('fug-adj-polish'))adjs2.push('Polish / Smooth');
+      if(isChk('fug-adj-hg-force'))adjs2.push('Adjust HG force');
+      if(isChk('fug-adj-replace'))adjs2.push('Replace broken component');
+      if(isChk('fug-adj-none'))adjs2.push('No adjustment');
+      if(adjs2.length) R('Adjustments', adjs2.join(', '));
+      R('Adjustment details', get('fug-adj-notes'));
+      R('Oral hygiene', radio('fug-oh'));
+
+      S('§6 — Transition Decision');
+      R('Decision', radio('fug-decision'));
+      const objs2=[];
+      if(isChk('fug-obj-oj'))objs2.push('OJ corrected');
+      if(isChk('fug-obj-molar'))objs2.push('Molar Class I');
+      if(isChk('fug-obj-canine'))objs2.push('Canine Class I');
+      if(isChk('fug-obj-skeletal'))objs2.push('Skeletal improvement');
+      if(isChk('fug-obj-soft'))objs2.push('Soft tissue improvement');
+      if(isChk('fug-obj-vert'))objs2.push('Vertical control');
+      if(objs2.length) R('Objectives achieved', objs2.join(', '));
+      R('Phase I duration', get('fug-phase-duration'));
+      R('Phase II start', radio('fug-phase2-start'));
+      const ret2=[];
+      if(isChk('fug-ret-same'))ret2.push('Continue as retainer');
+      if(isChk('fug-ret-vfr'))ret2.push('VFR / Essix');
+      if(isChk('fug-ret-hawley'))ret2.push('Hawley');
+      if(isChk('fug-ret-none'))ret2.push('None');
+      if(ret2.length) R('Interim retention', ret2.join(', '));
+      R('Next visit', get('fug-nv')); R('Referral', get('fug-referral'));
+      if(isChk('fug-aseptic')) RA('Aseptic technique and appropriate PPE were maintained and observed throughout the entire procedure. Confirmed by Clinician.');
+      R('Notes', get('fug-notes'));
       break;
     }
 
@@ -4998,6 +5697,202 @@ function toggleTadStatus(prefix) {
   if (wrap) wrap.style.display = cb?.checked ? '' : 'none';
 }
 
+// ══════════════════════════════════════════════════════════════
+// GROWTH MODIFICATION DEVICES (GMD) LOGIC
+// ══════════════════════════════════════════════════════════════
+
+function updateGmdCategory() {
+  const cat = document.querySelector('[name="gmd-category"]:checked')?.value;
+  document.getElementById('gmd-removable-wrap').style.display = cat === 'functional-removable' ? '' : 'none';
+  document.getElementById('gmd-fixed-wrap').style.display     = cat === 'functional-fixed'     ? '' : 'none';
+  document.getElementById('gmd-headgear-wrap').style.display  = cat === 'headgear'             ? '' : 'none';
+  // Show appliance-specific detail sections
+  updateGmdDetailPanel();
+}
+
+function updateGmdDetailPanel() {
+  const removableType = document.querySelector('[name="gmd-removable-type"]:checked')?.value || '';
+  const fixedType     = document.querySelector('[name="gmd-fixed-type"]:checked')?.value     || '';
+  const isTwinBlock   = removableType === 'Twin Block' || removableType === 'Modified Twin Block';
+  const isHerbst      = fixedType === 'Herbst' || fixedType === 'Forsus' || fixedType === 'Jasper Jumper' || fixedType === 'MARA' || fixedType === 'Sabbagh Universal Spring (SUS)';
+  const isGenericRemovable = !isTwinBlock && document.querySelector('[name="gmd-category"]:checked')?.value === 'functional-removable';
+  document.getElementById('gmd-detail-twinblock').style.display         = isTwinBlock       ? '' : 'none';
+  document.getElementById('gmd-detail-herbst').style.display            = isHerbst          ? '' : 'none';
+  document.getElementById('gmd-detail-generic-removable').style.display = isGenericRemovable? '' : 'none';
+}
+
+// Listen for appliance type change to update detail panels
+document.addEventListener('change', e => {
+  if (e.target.name === 'gmd-removable-type' || e.target.name === 'gmd-fixed-type') {
+    updateGmdDetailPanel();
+  }
+});
+
+function highlightCS() {
+  for (let i = 1; i <= 6; i++) {
+    const lbl = document.getElementById('cs-lbl-' + i);
+    const inp = document.getElementById('cs-lbl-' + i)?.querySelector('input');
+    if (lbl && inp) {
+      const active = inp.checked;
+      lbl.style.borderColor = active ? 'var(--teal)' : 'var(--grey-200)';
+      lbl.style.background  = active ? 'var(--teal-light)' : 'var(--white)';
+    }
+  }
+}
+
+// Calculate OJ/OB/LFH changes from baseline
+function calcGmdChange() {
+  const baseOJ  = parseFloat(document.getElementById('gmd-base-oj')?.value)  || null;
+  const baseOB  = parseFloat(document.getElementById('gmd-base-ob')?.value)  || null;
+  const baseLFH = parseFloat(document.getElementById('gmd-base-lfh')?.value) || null;
+  const nowOJ   = parseFloat(document.getElementById('fug-oj-now')?.value)   ?? null;
+  const nowOB   = parseFloat(document.getElementById('fug-ob-now')?.value)   ?? null;
+  const nowLFH  = parseFloat(document.getElementById('fug-lfh-now')?.value)  ?? null;
+
+  const fmt = (base, now, label, invert) => {
+    if (base === null || now === null || isNaN(now)) return '';
+    const diff = parseFloat((base - now).toFixed(1));
+    const sign = invert ? (diff > 0 ? '▼' : diff < 0 ? '▲' : '=') : (diff > 0 ? '▼' : diff < 0 ? '▲' : '=');
+    const color = diff > 0 ? 'var(--green)' : diff < 0 ? 'var(--red)' : 'var(--grey-500)';
+    return `<span style="color:${color}">${sign} ${Math.abs(diff)} mm change from baseline (was ${base} mm)</span>`;
+  };
+
+  const ojEl  = document.getElementById('fug-oj-change');
+  const obEl  = document.getElementById('fug-ob-change');
+  const lfhEl = document.getElementById('fug-lfh-change');
+  if (ojEl)  ojEl.innerHTML  = fmt(baseOJ,  nowOJ,  'OJ',  true);
+  if (obEl)  obEl.innerHTML  = fmt(baseOB,  nowOB,  'OB',  true);
+  if (lfhEl) lfhEl.innerHTML = baseLFH && nowLFH
+    ? `<span style="color:var(--teal)">LFH change: ${parseFloat((nowLFH - baseLFH).toFixed(1)) > 0 ? '▲' : '▼'} ${Math.abs(parseFloat((nowLFH - baseLFH).toFixed(1)))} mm</span>`
+    : '';
+}
+
+function updateGmdDecision() {
+  const val = document.querySelector('[name="fug-decision"]:checked')?.value || '';
+  const showDetail = val.includes('fixed') || val.includes('aligner') || val.includes('retention');
+  const detail = document.getElementById('fug-transition-detail');
+  if (detail) detail.style.display = showDetail ? '' : 'none';
+}
+
+// Summary for plan tab (GMD section)
+function gmdPlanSummaryLines() {
+  const L = []; const b = (l,v) => { if(v&&String(v).trim()) L.push(`  · ${l}: ${v}`); };
+  const cat = document.querySelector('[name="gmd-category"]:checked')?.value || '';
+  const remType = document.querySelector('[name="gmd-removable-type"]:checked')?.value || '';
+  const fixType = document.querySelector('[name="gmd-fixed-type"]:checked')?.value || '';
+  const hgType  = document.querySelector('[name="gmd-hg-type"]:checked')?.value || '';
+  b('Appliance category', {
+    'functional-removable': 'Functional Removable',
+    'functional-fixed': 'Functional Fixed',
+    'headgear': 'Headgear'
+  }[cat] || '');
+  b('Appliance', remType || fixType || hgType);
+  if (cat === 'headgear') {
+    b('HG attachment', document.querySelector('[name="gmd-hg-attach"]:checked')?.value || '');
+    b('HG force direction', document.querySelector('[name="gmd-hg-direction"]:checked')?.value || '');
+    b('Prescribed force', document.querySelector('[name="gmd-hg-force"]:checked')?.value || '');
+    b('Wear time', document.querySelector('[name="gmd-hg-wear"]:checked')?.value || '');
+  }
+  b('CS Stage', document.querySelector('[name="gmd-cs-stage"]:checked')?.value || '');
+  b('Growth status', document.querySelector('[name="gmd-growth-status"]:checked')?.value || '');
+  b('Skeletal class', document.querySelector('[name="gmd-skeletal-class"]:checked')?.value || '');
+  b('Vertical pattern', document.querySelector('[name="gmd-vert-pattern"]:checked')?.value || '');
+  // Baseline
+  const bOJ = get('gmd-base-oj'), bOB = get('gmd-base-ob'), bLFH = get('gmd-base-lfh');
+  if (bOJ)  b('Baseline OJ',  bOJ + ' mm');
+  if (bOB)  b('Baseline OB',  bOB + ' mm');
+  if (bLFH) b('Baseline LFH', bLFH + ' mm');
+  b('Baseline molar R', document.querySelector('[name="gmd-base-molar-r"]:checked')?.value || '');
+  b('Baseline molar L', document.querySelector('[name="gmd-base-molar-l"]:checked')?.value || '');
+  // TB detail
+  if (remType === 'Twin Block' || remType === 'Modified Twin Block') {
+    b('Advancement', get('gmd-tb-advance') ? get('gmd-tb-advance') + ' mm' : '');
+    b('Vertical opening', get('gmd-tb-vertical') ? get('gmd-tb-vertical') + ' mm' : '');
+    b('Midline', document.querySelector('[name="gmd-tb-midline"]:checked')?.value || '');
+    b('Wear', document.querySelector('[name="gmd-tb-wear"]:checked')?.value || '');
+  }
+  if (fixType) {
+    b('Rod length', get('gmd-herbst-rod'));
+    b('Advancement', get('gmd-herbst-advance') ? get('gmd-herbst-advance') + ' mm' : '');
+    b('Side', document.querySelector('[name="gmd-herbst-side"]:checked')?.value || '');
+  }
+  b('Treatment phase', document.querySelector('[name="gmd-phase"]:checked')?.value || '');
+  b('Estimated duration', get('gmd-duration'));
+  b('Treatment goals', get('gmd-goals'));
+  return L;
+}
+
+// GMD Follow-Up summary
+function buildFuGmdSummary() {
+  const L=[]; const b=(l,v)=>{if(v&&String(v).trim())L.push(`  · ${l}: ${v}`);}; const s=t=>L.push(`\n${t}`);
+  s('Growth Modification Device Follow-Up');
+  b('Patient', get('fug-name')); b('Visit #', get('fug-visit-no'));
+  b('Date', get('fug-date')); b('Clinician', get('fug-clinician'));
+  b('Appliance', document.querySelector('[name="fug-appliance-reminder"]:checked')?.value || '');
+
+  s('§5 — Progress Assessment');
+  b('Compliance', radio('fug-compliance'));
+  b('Reported wear', get('fug-wear-hrs') ? get('fug-wear-hrs') + ' hrs/day' : '');
+  b('Comfort', radio('fug-comfort'));
+
+  const ojN = get('fug-oj-now'), obN = get('fug-ob-now'), lfhN = get('fug-lfh-now');
+  const baseOJ = get('gmd-base-oj'), baseOB = get('gmd-base-ob'), baseLFH = get('gmd-base-lfh');
+  if (ojN) {
+    const diff = baseOJ ? ` (was ${baseOJ} mm → change: ${parseFloat((baseOJ - ojN).toFixed(1))} mm)` : '';
+    b('OJ now', ojN + ' mm' + diff);
+  }
+  if (obN) {
+    const diff = baseOB ? ` (was ${baseOB} mm → change: ${parseFloat((baseOB - obN).toFixed(1))} mm)` : '';
+    b('OB now', obN + ' mm' + diff);
+  }
+  if (lfhN) {
+    const diff = baseLFH ? ` (change: ${parseFloat((lfhN - baseLFH).toFixed(1))} mm)` : '';
+    b('LFH now', lfhN + ' mm' + diff);
+  }
+  b('Molar R', radio('fug-molar-r')); b('Molar L', radio('fug-molar-l'));
+  b('Canine R', radio('fug-canine-r')); b('Canine L', radio('fug-canine-l'));
+  b('Skeletal response', radio('fug-skeletal-resp'));
+  b('Soft tissue', radio('fug-soft-tissue'));
+  b('Overall progress', radio('fug-overall'));
+
+  const adjs=[];
+  if(isChk('fug-adj-trim'))adjs.push('Trim bite block');
+  if(isChk('fug-adj-activate'))adjs.push('Activate expansion screw');
+  if(isChk('fug-adj-advance'))adjs.push('Advance rod');
+  if(isChk('fug-adj-new-bite'))adjs.push('New bite registration');
+  if(isChk('fug-adj-repair'))adjs.push('Repair appliance');
+  if(isChk('fug-adj-polish'))adjs.push('Polish / Smooth');
+  if(isChk('fug-adj-hg-force'))adjs.push('Adjust HG force');
+  if(isChk('fug-adj-replace'))adjs.push('Replace broken component');
+  if(isChk('fug-adj-none'))adjs.push('No adjustment');
+  if(adjs.length) b('Adjustments', adjs.join(', '));
+  b('Adjustment details', get('fug-adj-notes'));
+  b('Oral hygiene', radio('fug-oh'));
+
+  s('§6 — Transition Decision');
+  b('Decision', radio('fug-decision'));
+  const objs=[];
+  if(isChk('fug-obj-oj'))objs.push('OJ corrected');
+  if(isChk('fug-obj-molar'))objs.push('Molar Class I');
+  if(isChk('fug-obj-canine'))objs.push('Canine Class I');
+  if(isChk('fug-obj-skeletal'))objs.push('Skeletal improvement');
+  if(isChk('fug-obj-soft'))objs.push('Soft tissue improvement');
+  if(isChk('fug-obj-vert'))objs.push('Vertical control');
+  if(objs.length) b('Objectives achieved', objs.join(', '));
+  b('Phase I duration', get('fug-phase-duration'));
+  b('Phase II start', radio('fug-phase2-start'));
+  const ret=[];
+  if(isChk('fug-ret-same'))ret.push('Continue as retainer');
+  if(isChk('fug-ret-vfr'))ret.push('VFR / Essix');
+  if(isChk('fug-ret-hawley'))ret.push('Hawley');
+  if(isChk('fug-ret-none'))ret.push('None');
+  if(ret.length) b('Interim retention', ret.join(', '));
+  b('N.V.', get('fug-nv')); b('Referral', get('fug-referral'));
+  b('Aseptic technique & PPE', isChk('fug-aseptic') ? 'Maintained and observed' : '');
+  b('Notes', get('fug-notes'));
+  return L.join('\n').trim();
+}
+
 // ── Listen for admin changes (when admin panel is open in another tab) ─
 window.addEventListener('storage', e => {
   if (e.key === 'ortho_admin_update') applyAdminSchema();
@@ -5009,7 +5904,7 @@ window.addEventListener('storage', e => {
 
 // Track which tabs have unsaved changes
 const unsavedTabs = new Set();
-const ALL_TABS = ['exam','plan','bond','fu-fixed','fu-aligner','emergency','debond','tad'];
+const ALL_TABS = ['exam','plan','bond','fu-fixed','fu-aligner','fu-gmd','emergency','debond','tad'];
 
 // Mark current tab as having unsaved changes
 function markUnsaved() {
@@ -5139,13 +6034,13 @@ window.addEventListener('beforeunload', e => {
   });
 
   applyAdminSchema();
-  ['exam','plan','bond','fu-fixed','fu-aligner','emergency','debond','tad'].forEach(loadForm);
+  ['exam','plan','bond','fu-fixed','fu-aligner','fu-gmd','emergency','debond','tad'].forEach(loadForm);
   updateApplianceCard();
   updateBondCard();
   updateProgress();
 
   // Default: all aseptic checkboxes checked (including tad)
-  ['aseptic-confirm','bond-aseptic','fuf-aseptic','fua-aseptic','em-aseptic','db-aseptic','tad-aseptic'].forEach(id=>{
+  ['aseptic-confirm','bond-aseptic','fuf-aseptic','fua-aseptic','fug-aseptic','em-aseptic','db-aseptic','tad-aseptic'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.checked=true;
   });
 
