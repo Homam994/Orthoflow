@@ -3,211 +3,184 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ortho Records — Admin Panel</title>
+<title>EasyOrtho — Admin Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --navy: #0d1b2a;
-    --navy-mid: #152336;
-    --navy-light: #1e3448;
-    --teal: #1a7a7a;
-    --teal-light: #e8f5f5;
-    --teal-mid: #c2e8e8;
-    --gold: #c9a84c;
-    --gold-light: #fdf6e3;
+    --navy: #0d1b2a; --navy-mid: #152336; --navy-light: #1e3448;
+    --teal: #1a7a7a; --teal-light: #e8f5f5; --teal-mid: #c2e8e8;
+    --gold: #c9a84c; --gold-light: #fdf6e3;
     --white: #ffffff;
-    --grey-50: #f8fafb;
-    --grey-100: #f0f4f7;
-    --grey-200: #dce4ea;
-    --grey-300: #c5d1da;
-    --grey-400: #93a7b5;
-    --grey-500: #6e8fa0;
-    --grey-600: #5a7080;
-    --grey-800: #2d3f4a;
+    --grey-50: #f8fafb; --grey-100: #f0f4f7; --grey-200: #dce4ea;
+    --grey-300: #c5d1da; --grey-400: #93a7b5; --grey-500: #6e8fa0;
+    --grey-600: #5a7080; --grey-800: #2d3f4a;
     --text: #1a2a35;
-    --red: #a02820;
-    --red-light: #fdecea;
-    --green: #1a5c3a;
-    --green-light: #e8f5e9;
-    --radius: 10px;
-    --shadow: 0 2px 12px rgba(13,27,42,0.08);
-    --sidebar-w: 240px;
+    --red: #a02820; --red-light: #fdecea;
+    --green: #1a5c3a; --green-light: #e8f5e9;
+    --radius: 10px; --shadow: 0 2px 12px rgba(13,27,42,0.08);
+    --sidebar-w: 256px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'DM Sans', sans-serif; background: var(--grey-50); color: var(--text); min-height: 100vh; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--grey-50); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
 
   /* ── Header ── */
   .page-header {
-    background: var(--navy); padding: 0 28px;
-    display: grid; grid-template-columns: auto 1fr auto;
-    align-items: center; justify-items: center;
+    background: var(--navy); padding: 0 24px;
+    display: flex; align-items: center; justify-content: space-between;
     position: sticky; top: 0; z-index: 300;
-    box-shadow: 0 2px 20px rgba(0,0,0,0.25);
-    height: 60px;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.25); height: 58px; flex-shrink: 0;
   }
-  .header-brand { display: flex; align-items: center; gap: 12px; justify-self: start; }
-  .header-icon { width: 34px; height: 34px; background: var(--gold); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-  .header-title { font-family: 'DM Serif Display', serif; color: var(--white); font-size: 1.1rem; }
-  .header-sub { color: var(--gold); font-size: 0.63rem; letter-spacing: 0.09em; text-transform: uppercase; margin-top: 1px; }
-  .header-actions { display: flex; gap: 6px; align-items: center; justify-self: end; }
-
-  /* ── Centered author signature in header ── */
-  .header-author-center {
-    display: flex; align-items: center; gap: 9px;
-    padding: 5px 12px; border-radius: 20px;
-    border: 1px solid rgba(201,168,76,0.3);
-    background: rgba(201,168,76,0.08);
-    text-decoration: none;
-    transition: background 0.2s, border-color 0.2s;
+  .header-brand { display: flex; align-items: center; gap: 11px; }
+  .header-icon { width: 32px; height: 32px; background: var(--gold); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+  .header-title { font-family: 'DM Serif Display', serif; color: var(--white); font-size: 1.05rem; }
+  .header-sub { color: var(--gold); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 1px; }
+  .header-actions { display: flex; gap: 6px; align-items: center; }
+  .author-pill {
+    display: flex; align-items: center; gap: 7px;
+    padding: 4px 11px; border-radius: 20px;
+    background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.25);
   }
-  .header-author-center:hover {
-    background: rgba(201,168,76,0.16);
-    border-color: rgba(201,168,76,0.5);
-  }
+  .author-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); }
+  .author-name { font-size: 0.74rem; color: var(--gold); font-weight: 500; }
+  .author-role { font-size: 0.57rem; color: rgba(201,168,76,0.55); text-transform: uppercase; letter-spacing: 0.06em; }
 
   /* ── Layout ── */
-  .layout { display: flex; min-height: calc(100vh - 60px); }
+  .layout { display: flex; flex: 1; min-height: 0; }
 
   /* ── Sidebar ── */
   .sidebar {
     width: var(--sidebar-w); flex-shrink: 0;
     background: var(--navy-mid); border-right: 1px solid rgba(255,255,255,0.06);
-    position: sticky; top: 60px; height: calc(100vh - 60px);
-    overflow-y: auto; padding: 12px 0;
+    position: sticky; top: 58px; height: calc(100vh - 58px);
+    overflow-y: auto; padding: 10px 0;
   }
-  .sidebar::-webkit-scrollbar { width: 4px; }
-  .sidebar::-webkit-scrollbar-track { background: transparent; }
-  .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
-
-  .sidebar-group { margin-bottom: 4px; }
+  .sidebar::-webkit-scrollbar { width: 3px; }
+  .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+  .sidebar-group { margin-bottom: 2px; }
   .sidebar-group-label {
-    font-size: 0.59rem; font-weight: 700; letter-spacing: 0.12em;
-    text-transform: uppercase; color: rgba(255,255,255,0.28);
-    padding: 10px 16px 4px;
+    font-size: 0.57rem; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 10px 15px 3px;
   }
   .sidebar-item {
-    display: flex; align-items: center; gap: 9px;
-    padding: 8px 16px; cursor: pointer; transition: all 0.15s;
-    font-size: 0.82rem; color: rgba(255,255,255,0.55);
-    border-left: 2px solid transparent; position: relative;
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 15px; cursor: pointer; transition: all 0.15s;
+    font-size: 0.8rem; color: rgba(255,255,255,0.5);
+    border-left: 2px solid transparent;
   }
-  .sidebar-item:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.85); }
-  .sidebar-item.active {
-    background: rgba(26,122,122,0.18); color: var(--teal-mid);
-    border-left-color: var(--teal); font-weight: 600;
-  }
-  .sidebar-icon { font-size: 14px; flex-shrink: 0; width: 18px; text-align: center; }
+  .sidebar-item:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.8); }
+  .sidebar-item.active { background: rgba(26,122,122,0.16); color: var(--teal-mid); border-left-color: var(--teal); font-weight: 600; }
+  .sidebar-icon { font-size: 13px; width: 17px; text-align: center; flex-shrink: 0; }
   .sidebar-count {
-    margin-left: auto; font-size: 0.6rem; font-weight: 700;
-    background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.4);
+    margin-left: auto; font-size: 0.58rem; font-weight: 700;
+    background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.35);
     border-radius: 10px; padding: 1px 6px; min-width: 18px; text-align: center;
   }
-  .sidebar-item.active .sidebar-count { background: rgba(26,122,122,0.3); color: var(--teal-mid); }
+  .sidebar-item.active .sidebar-count { background: rgba(26,122,122,0.28); color: var(--teal-mid); }
 
   /* ── Main ── */
-  .main { flex: 1; min-width: 0; }
-
-  /* ── Panel header ── */
+  .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
   .panel-topbar {
     background: var(--white); border-bottom: 1px solid var(--grey-200);
-    padding: 16px 28px;
-    display: flex; align-items: center; justify-content: space-between;
-    position: sticky; top: 60px; z-index: 100;
+    padding: 14px 24px; display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 58px; z-index: 100;
   }
-  .panel-title { font-family: 'DM Serif Display', serif; font-size: 1.2rem; color: var(--navy); }
-  .panel-desc { font-size: 0.79rem; color: var(--grey-500); margin-top: 2px; }
-
-  /* ── Content area ── */
-  .content-area { padding: 20px 28px 80px; }
+  .panel-title { font-family: 'DM Serif Display', serif; font-size: 1.15rem; color: var(--navy); }
+  .panel-desc { font-size: 0.77rem; color: var(--grey-500); margin-top: 2px; }
+  .content-area { padding: 18px 24px 100px; flex: 1; }
 
   /* ── Panels ── */
   .panel { display: none; }
   .panel.active { display: block; }
 
-  /* ── Info box ── */
-  .info-box {
-    background: var(--teal-light); border: 1px solid var(--teal-mid);
-    border-radius: 8px; padding: 11px 14px; font-size: 0.81rem;
-    color: var(--teal); display: flex; gap: 10px; align-items: flex-start;
-    margin-bottom: 16px;
-  }
+  /* ── Cards ── */
+  .card { background: var(--white); border: 1px solid var(--grey-200); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 13px; overflow: hidden; }
+  .card-header { display: flex; align-items: center; gap: 9px; padding: 10px 15px; background: var(--grey-50); border-bottom: 1px solid var(--grey-200); }
+  .card-title { font-size: 0.81rem; font-weight: 700; color: var(--navy); flex: 1; }
+  .card-body { padding: 13px 15px; }
 
-  /* ── Card ── */
-  .card {
-    background: var(--white); border: 1px solid var(--grey-200);
-    border-radius: var(--radius); box-shadow: var(--shadow);
-    margin-bottom: 14px; overflow: hidden;
-  }
-  .card-header {
-    display: flex; align-items: center; gap: 10px;
-    padding: 11px 16px; background: var(--grey-50);
-    border-bottom: 1px solid var(--grey-200);
-  }
-  .card-title { font-size: 0.82rem; font-weight: 700; color: var(--navy); flex: 1; }
-  .card-body { padding: 14px 16px; }
-  .card-footer {
-    padding: 10px 16px; background: var(--grey-50);
-    border-top: 1px solid var(--grey-200);
-    display: flex; gap: 8px; align-items: center;
-  }
+  /* ── Settings card ── */
+  .settings-card { background: var(--white); border: 1px solid var(--grey-200); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 13px; }
+  .settings-card-title { font-family: 'DM Serif Display', serif; font-size: 0.93rem; color: var(--navy); padding: 11px 15px; border-bottom: 1px solid var(--grey-200); background: var(--grey-50); border-radius: var(--radius) var(--radius) 0 0; }
+  .setting-row { display: flex; align-items: center; justify-content: space-between; padding: 11px 15px; border-bottom: 1px solid var(--grey-200); gap: 14px; }
+  .setting-row:last-child { border-bottom: none; }
+  .setting-row.col { flex-direction: column; align-items: flex-start; }
+  .setting-label { font-size: 0.83rem; font-weight: 500; color: var(--text); }
+  .setting-desc { font-size: 0.72rem; color: var(--grey-500); margin-top: 2px; }
 
-  /* ── Badge ── */
-  .badge {
-    font-size: 0.6rem; font-weight: 700; border-radius: 5px;
-    padding: 2px 7px; letter-spacing: 0.04em; text-transform: uppercase;
+  /* ── Inline inputs ── */
+  .inline-input {
+    border: 1.5px solid var(--grey-200); border-radius: 7px;
+    padding: 6px 10px; font-family: 'DM Sans', sans-serif; font-size: 0.83rem;
+    color: var(--text); outline: none; transition: border-color 0.18s;
   }
+  .inline-input:focus { border-color: var(--teal); }
+  textarea.inline-input { resize: vertical; min-height: 64px; line-height: 1.5; }
+
+  /* ── Badges ── */
+  .badge { font-size: 0.59rem; font-weight: 700; border-radius: 5px; padding: 2px 7px; letter-spacing: 0.04em; text-transform: uppercase; }
   .badge-radio   { background: #e8f0ff; color: #3355cc; }
   .badge-check   { background: #fff0e0; color: #a05010; }
   .badge-text    { background: var(--teal-light); color: var(--teal); }
   .badge-select  { background: #f5eaff; color: #6a1f9e; }
   .badge-pills   { background: var(--red-light); color: var(--red); }
+  .badge-new     { background: var(--green-light); color: var(--green); }
+
+  /* ── Notation picker ── */
+  .notation-picker { display: flex; gap: 6px; flex-wrap: wrap; }
+  .notation-opt {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border: 1.5px solid var(--grey-200); border-radius: 8px;
+    cursor: pointer; font-size: 0.82rem; font-weight: 500; transition: all 0.15s;
+  }
+  .notation-opt input { display: none; }
+  .notation-opt.selected { border-color: var(--teal); background: var(--teal-light); color: var(--teal); }
 
   /* ── Options list ── */
   .options-list { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
   .option-row {
     display: flex; align-items: center; gap: 7px;
     background: var(--grey-50); border: 1.5px solid var(--grey-200);
-    border-radius: 7px; padding: 6px 10px; transition: all 0.15s;
+    border-radius: 7px; padding: 5px 9px; transition: all 0.15s;
   }
   .option-row:hover { border-color: var(--grey-300); }
   .option-row.drag-over { border-color: var(--teal); background: var(--teal-light); }
-  .drag-handle {
-    color: var(--grey-400); cursor: grab; font-size: 13px;
-    padding: 2px; user-select: none; flex-shrink: 0;
-  }
+  .drag-handle { color: var(--grey-400); cursor: grab; font-size: 13px; padding: 2px; user-select: none; flex-shrink: 0; }
   .drag-handle:active { cursor: grabbing; }
-  .option-input {
-    flex: 1; font-size: 0.84rem; color: var(--text);
-    border: none; background: transparent; outline: none;
-    font-family: 'DM Sans', sans-serif; min-width: 0;
-  }
+  .option-input { flex: 1; font-size: 0.83rem; color: var(--text); border: none; background: transparent; outline: none; font-family: 'DM Sans', sans-serif; min-width: 0; }
   .option-input:focus { color: var(--teal); }
-  .btn-del {
-    width: 22px; height: 22px; border-radius: 5px; border: none;
-    background: transparent; color: var(--grey-400); cursor: pointer;
-    font-size: 13px; display: flex; align-items: center; justify-content: center;
-    transition: all 0.15s; flex-shrink: 0;
-  }
+  .btn-del { width: 21px; height: 21px; border-radius: 5px; border: none; background: transparent; color: var(--grey-400); cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; flex-shrink: 0; }
   .btn-del:hover { background: var(--red-light); color: var(--red); }
 
   /* ── Add row ── */
-  .add-row { display: flex; gap: 7px; }
-  .add-input {
-    flex: 1; border: 1.5px dashed var(--grey-300); border-radius: 7px;
-    padding: 6px 10px; font-family: 'DM Sans', sans-serif; font-size: 0.84rem;
-    color: var(--text); background: var(--white); outline: none; transition: all 0.18s;
-  }
+  .add-row { display: flex; gap: 6px; }
+  .add-input { flex: 1; border: 1.5px dashed var(--grey-300); border-radius: 7px; padding: 5px 9px; font-family: 'DM Sans', sans-serif; font-size: 0.83rem; color: var(--text); background: var(--white); outline: none; transition: all 0.18s; }
   .add-input:focus { border-color: var(--teal); border-style: solid; }
   .add-input::placeholder { color: var(--grey-400); }
 
+  /* ── Preview strip ── */
+  .preview-strip { display: flex; flex-wrap: wrap; gap: 4px; padding: 8px 10px; background: var(--grey-50); border: 1px solid var(--grey-200); border-radius: 7px; margin-top: 8px; }
+  .preview-label { font-size: 0.61rem; color: var(--grey-400); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 4px; width: 100%; }
+  .preview-chip { padding: 3px 8px; border: 1.5px solid var(--grey-200); border-radius: 6px; font-size: 0.73rem; color: var(--grey-700); background: var(--white); }
+
+  /* ── Wire grid ── */
+  .wire-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
+
+  /* ── Clinician list ── */
+  .clinician-row { display: flex; align-items: center; gap: 7px; margin-bottom: 6px; }
+  .clinician-input { flex: 1; border: 1.5px solid var(--grey-200); border-radius: 7px; padding: 6px 10px; font-family: 'DM Sans', sans-serif; font-size: 0.83rem; color: var(--text); outline: none; transition: border-color 0.15s; }
+  .clinician-input:focus { border-color: var(--teal); }
+
+  /* ── Toggle switch ── */
+  .toggle { position: relative; width: 38px; height: 22px; cursor: pointer; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-track { position: absolute; inset: 0; background: var(--grey-200); border-radius: 22px; transition: 0.2s; }
+  .toggle-thumb { position: absolute; width: 16px; height: 16px; left: 3px; top: 3px; background: white; border-radius: 50%; transition: 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+  .toggle input:checked ~ .toggle-track { background: var(--teal); }
+  .toggle input:checked ~ .toggle-thumb { transform: translateX(16px); }
+
   /* ── Buttons ── */
-  .btn {
-    display: inline-flex; align-items: center; gap: 5px;
-    padding: 7px 13px; border-radius: 8px; font-family: 'DM Sans', sans-serif;
-    font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.18s; border: none;
-  }
+  .btn { display: inline-flex; align-items: center; gap: 5px; padding: 7px 13px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.18s; border: none; }
   .btn-sm { padding: 5px 10px; font-size: 0.76rem; border-radius: 7px; }
-  .btn-xs { padding: 4px 8px; font-size: 0.72rem; border-radius: 6px; }
   .btn-primary { background: var(--teal); color: white; }
   .btn-primary:hover { background: #155f5f; }
   .btn-outline { background: var(--white); border: 1.5px solid var(--grey-200); color: var(--grey-800); }
@@ -216,184 +189,73 @@
   .btn-gold:hover { background: #a8872f; }
   .btn-danger { background: var(--white); border: 1.5px solid var(--grey-200); color: var(--red); }
   .btn-danger:hover { border-color: var(--red); background: var(--red-light); }
-  .btn-ghost { background: transparent; color: var(--grey-600); border: none; }
-  .btn-ghost:hover { background: var(--grey-100); color: var(--navy); }
+  .btn-ghost { background: transparent; color: rgba(255,255,255,0.45); border: 1px solid rgba(255,255,255,0.1); }
+  .btn-ghost:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.75); }
 
-  /* ── Settings rows ── */
-  .settings-card { background: var(--white); border: 1px solid var(--grey-200); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 14px; }
-  .settings-card-title { font-family: 'DM Serif Display', serif; font-size: 0.95rem; color: var(--navy); padding: 12px 16px; border-bottom: 1px solid var(--grey-200); background: var(--grey-50); border-radius: var(--radius) var(--radius) 0 0; }
-  .setting-row {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 16px; border-bottom: 1px solid var(--grey-200);
-    gap: 16px;
-  }
-  .setting-row:last-child { border-bottom: none; }
-  .setting-label { font-size: 0.84rem; font-weight: 500; color: var(--text); }
-  .setting-desc { font-size: 0.74rem; color: var(--grey-500); margin-top: 2px; }
-  .setting-control { flex-shrink: 0; }
-  .inline-input {
-    border: 1.5px solid var(--grey-200); border-radius: 7px;
-    padding: 6px 10px; font-family: 'DM Sans', sans-serif; font-size: 0.84rem;
-    color: var(--text); outline: none; transition: border-color 0.18s;
-  }
-  .inline-input:focus { border-color: var(--teal); }
+  /* ── Info box ── */
+  .info-box { background: var(--teal-light); border: 1px solid var(--teal-mid); border-radius: 8px; padding: 10px 13px; font-size: 0.8rem; color: var(--teal); display: flex; gap: 9px; align-items: flex-start; margin-bottom: 14px; }
+  .warn-box { background: #fff9e6; border: 1px solid #f5d87a; border-radius: 8px; padding: 10px 13px; font-size: 0.8rem; color: #7a5c00; display: flex; gap: 9px; align-items: flex-start; margin-bottom: 14px; }
 
-  /* ── Toggle switch ── */
-  .toggle { position: relative; width: 38px; height: 22px; cursor: pointer; }
-  .toggle input { opacity: 0; width: 0; height: 0; }
-  .toggle-track {
-    position: absolute; inset: 0; background: var(--grey-200);
-    border-radius: 22px; transition: 0.2s;
-  }
-  .toggle-thumb {
-    position: absolute; width: 16px; height: 16px; left: 3px; top: 3px;
-    background: white; border-radius: 50%; transition: 0.2s;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-  }
-  .toggle input:checked ~ .toggle-track { background: var(--teal); }
-  .toggle input:checked ~ .toggle-thumb { transform: translateX(16px); }
-
-  /* ── Notation picker ── */
-  .notation-picker { display: flex; gap: 7px; }
-  .notation-opt {
-    display: flex; align-items: center; gap: 6px;
-    padding: 6px 12px; border: 1.5px solid var(--grey-200); border-radius: 8px;
-    cursor: pointer; font-size: 0.83rem; font-weight: 500; transition: all 0.15s;
-  }
-  .notation-opt input { display: none; }
-  .notation-opt.selected { border-color: var(--teal); background: var(--teal-light); color: var(--teal); }
-
-  /* ── Wire grid ── */
-  .wire-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-
-  /* ── Form tabs (for form field sections) ── */
-  .form-tabs { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 16px; }
-  .form-tab {
-    padding: 6px 12px; border-radius: 8px; border: 1.5px solid var(--grey-200);
-    font-size: 0.78rem; font-weight: 600; color: var(--grey-600);
-    cursor: pointer; transition: all 0.15s; background: var(--white);
-  }
-  .form-tab:hover { border-color: var(--teal); color: var(--teal); }
-  .form-tab.active { background: var(--navy); color: white; border-color: var(--navy); }
-
-  .form-section { display: none; }
-  .form-section.active { display: block; }
-
-  /* ── Preview strip ── */
-  .preview-strip {
-    display: flex; flex-wrap: wrap; gap: 4px;
-    padding: 8px 10px; background: var(--grey-50);
-    border: 1px solid var(--grey-200); border-radius: 7px; margin-top: 8px;
-  }
-  .preview-chip {
-    padding: 3px 8px; border: 1.5px solid var(--grey-200);
-    border-radius: 6px; font-size: 0.74rem; color: var(--grey-700);
-    background: var(--white);
-  }
-  .preview-label { font-size: 0.62rem; color: var(--grey-400); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 5px; width: 100%; }
-
-  /* ── Clinician list ── */
-  .clinician-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-  .clinician-input {
-    flex: 1; border: 1.5px solid var(--grey-200); border-radius: 7px;
-    padding: 7px 10px; font-family: 'DM Sans', sans-serif; font-size: 0.84rem;
-    color: var(--text); outline: none; transition: border-color 0.15s;
-  }
-  .clinician-input:focus { border-color: var(--teal); }
-
-  /* ── IO panel ── */
-  .io-card { background: var(--white); border: 1px solid var(--grey-200); border-radius: var(--radius); padding: 16px; margin-bottom: 14px; box-shadow: var(--shadow); }
-  .io-card h3 { font-family: 'DM Serif Display', serif; font-size: 0.95rem; color: var(--navy); margin-bottom: 6px; }
-  .io-card p { font-size: 0.8rem; color: var(--grey-600); margin-bottom: 12px; line-height: 1.5; }
-  .io-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  /* ── IO cards ── */
+  .io-card { background: var(--white); border: 1px solid var(--grey-200); border-radius: var(--radius); padding: 15px; margin-bottom: 13px; box-shadow: var(--shadow); }
+  .io-card h3 { font-family: 'DM Serif Display', serif; font-size: 0.93rem; color: var(--navy); margin-bottom: 5px; }
+  .io-card p { font-size: 0.79rem; color: var(--grey-600); margin-bottom: 11px; line-height: 1.5; }
+  .io-row { display: flex; gap: 7px; flex-wrap: wrap; }
 
   /* ── Toast ── */
-  .toast {
-    position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(14px);
-    background: var(--navy); color: white; padding: 9px 20px; border-radius: 9px;
-    font-size: 0.84rem; font-weight: 500; z-index: 9999;
-    opacity: 0; transition: all 0.25s; pointer-events: none; white-space: nowrap;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-  }
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(12px); background: var(--navy); color: white; padding: 9px 20px; border-radius: 9px; font-size: 0.83rem; font-weight: 500; z-index: 9999; opacity: 0; transition: all 0.25s; pointer-events: none; white-space: nowrap; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast.success { background: var(--green); }
   .toast.error   { background: var(--red); }
 
-  /* ── Sticky save bar ── */
-  .save-bar {
-    position: sticky; bottom: 0; z-index: 100;
-    background: rgba(248,250,251,0.95); backdrop-filter: blur(8px);
-    border-top: 1px solid var(--grey-200); padding: 10px 28px;
-    display: flex; gap: 8px; justify-content: flex-end;
-  }
-
-  /* ── Author credit ── */
-  .author-credit {
-    display: flex; align-items: center; gap: 8px;
-    padding: 4px 11px; border-radius: 20px;
-    background: rgba(201,168,76,0.12);
-    border: 1px solid rgba(201,168,76,0.25);
-  }
-  .author-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
-  .author-name { font-size: 0.75rem; color: var(--gold); font-weight: 500; letter-spacing: 0.02em; }
-  .author-role { font-size: 0.58rem; color: rgba(201,168,76,0.55); letter-spacing: 0.06em; text-transform: uppercase; }
+  /* ── Save bar ── */
+  .save-bar { position: sticky; bottom: 0; z-index: 100; background: rgba(248,250,251,0.96); backdrop-filter: blur(8px); border-top: 1px solid var(--grey-200); padding: 9px 24px; display: flex; gap: 7px; justify-content: flex-end; }
 
   /* ── Footer ── */
-  .page-footer {
-    background: var(--navy-mid); border-top: 1px solid rgba(255,255,255,0.06);
-    padding: 14px 28px; display: flex; align-items: center;
-    justify-content: space-between; flex-wrap: wrap; gap: 10px;
-    margin-top: auto;
-  }
-  .footer-brand { display: flex; align-items: center; gap: 9px; }
-  .footer-icon { width: 24px; height: 24px; background: var(--gold); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; }
-  .footer-text { color: rgba(255,255,255,0.3); font-size: 0.75rem; }
-  .footer-author {
-    display: flex; align-items: center; gap: 9px;
-    padding: 5px 12px; border-radius: 20px;
-    border: 1px solid rgba(201,168,76,0.3);
-    background: rgba(201,168,76,0.08);
-    text-decoration: none;
-    transition: background 0.2s, border-color 0.2s;
-  }
-  .footer-author:hover { background: rgba(201,168,76,0.16); border-color: rgba(201,168,76,0.5); }
+  .page-footer { background: var(--navy-mid); border-top: 1px solid rgba(255,255,255,0.06); padding: 13px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 9px; }
+  .footer-brand { display: flex; align-items: center; gap: 8px; }
+  .footer-icon { width: 23px; height: 23px; background: var(--gold); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; }
+  .footer-text { color: rgba(255,255,255,0.3); font-size: 0.73rem; }
+  .footer-author { display: flex; align-items: center; gap: 9px; padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(201,168,76,0.28); background: rgba(201,168,76,0.07); }
   .footer-author-name { font-family: 'DM Serif Display', serif; font-size: 0.82rem; color: var(--gold); display: block; }
-  .footer-author-label { font-size: 0.58rem; color: rgba(255,255,255,0.25); letter-spacing: 0.07em; text-transform: uppercase; }
-  .footer-copy { font-size: 0.65rem; color: rgba(255,255,255,0.18); }
+  .footer-author-label { font-size: 0.57rem; color: rgba(255,255,255,0.22); letter-spacing: 0.07em; text-transform: uppercase; }
+  .footer-copy { font-size: 0.63rem; color: rgba(255,255,255,0.18); }
 
-  /* ── Mobile ── */
-  @media (max-width: 768px) {
+  /* ── Notation live demo ── */
+  .notation-demo { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 10px; padding: 10px; background: var(--grey-50); border: 1px solid var(--grey-200); border-radius: 8px; }
+  .ndemo-tooth { padding: 3px 7px; border: 1.5px solid var(--grey-200); border-radius: 5px; font-size: 0.72rem; font-weight: 700; color: var(--grey-600); background: var(--white); transition: all 0.2s; }
+  .ndemo-tooth.upper { border-color: var(--teal-mid); color: var(--teal); }
+  .ndemo-tooth.lower { border-color: #e8d89a; color: #7a6020; }
+  .ndemo-sep { width: 2px; height: 20px; background: var(--gold); border-radius: 2px; margin: 0 3px; align-self: center; }
+
+  @media (max-width: 900px) {
     .sidebar { display: none; }
-    .page-header { grid-template-columns: 1fr auto; }
-    .header-author-center { display: none; }
-    .panel-topbar { padding: 12px 14px; }
-    .content-area { padding: 14px 14px 80px; }
     .wire-grid { grid-template-columns: 1fr; }
+    .content-area { padding: 14px 13px 90px; }
+    .panel-topbar { padding: 11px 13px; }
   }
 </style>
 </head>
 <body>
 
+<!-- ══ HEADER ══ -->
 <div class="page-header">
   <div class="header-brand">
     <div class="header-icon">⚙️</div>
     <div>
       <div class="header-title">Admin Panel</div>
-      <div class="header-sub">Orthodontic Records System</div>
+      <div class="header-sub">EasyOrtho System</div>
     </div>
   </div>
-
-  <!-- Centered author signature -->
-  <a href="mailto:homam.alsmman@gmail.com" class="header-author-center" title="Contact: homam.alsmman@gmail.com">
-    <span style="font-size:14px;">🩺</span>
-    <div>
-      <span class="footer-author-name">Dr. Mohammed Homam Alsamman</span>
-      <span class="footer-author-label">Concept, Design &amp; Development</span>
-    </div>
-  </a>
-
   <div class="header-actions">
-    <a href="index.html" class="btn btn-ghost btn-sm" style="color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.1);">← Back to Forms</a>
+    <div class="author-pill">
+      <div class="author-dot"></div>
+      <div>
+        <div class="author-name">Dr. Mohammed Homam Alsamman</div>
+        <div class="author-role">Designer &amp; Developer</div>
+      </div>
+    </div>
+    <a href="index.html" class="btn btn-ghost btn-sm">← Back to Forms</a>
     <button class="btn btn-outline btn-sm" onclick="exportSettings()">📤 Export</button>
     <button class="btn btn-gold btn-sm" onclick="document.getElementById('file-import').click()">📥 Import</button>
     <input type="file" id="file-import" accept=".json" style="display:none" onchange="importSettings(this)">
@@ -416,12 +278,15 @@
         <span class="sidebar-icon">👨‍⚕️</span> Clinicians
         <span class="sidebar-count" id="cnt-clinicians">0</span>
       </div>
+      <div class="sidebar-item" onclick="showPanel('notation')" id="nav-notation">
+        <span class="sidebar-icon">🔢</span> Tooth Notation
+      </div>
       <div class="sidebar-item" onclick="showPanel('wires')" id="nav-wires">
         <span class="sidebar-icon">🔩</span> Wire Options
       </div>
     </div>
     <div class="sidebar-group">
-      <div class="sidebar-group-label">Form Fields</div>
+      <div class="sidebar-group-label">Form Fields — Clinical</div>
       <div class="sidebar-item" onclick="showPanel('form-exam')" id="nav-form-exam">
         <span class="sidebar-icon">🔍</span> Examination
         <span class="sidebar-count" id="cnt-exam">0</span>
@@ -430,6 +295,9 @@
         <span class="sidebar-icon">📝</span> Treatment Plan
         <span class="sidebar-count" id="cnt-plan">0</span>
       </div>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-label">Form Fields — Visits</div>
       <div class="sidebar-item" onclick="showPanel('form-bond')" id="nav-form-bond">
         <span class="sidebar-icon">🔗</span> Bond-Up
         <span class="sidebar-count" id="cnt-bond">0</span>
@@ -442,121 +310,94 @@
         <span class="sidebar-icon">💎</span> Aligner Follow-Up
         <span class="sidebar-count" id="cnt-fu-aligner">0</span>
       </div>
+      <div class="sidebar-item" onclick="showPanel('form-fu-gmd')" id="nav-form-fu-gmd">
+        <span class="sidebar-icon">🌱</span> GMD Follow-Up
+        <span class="sidebar-count" id="cnt-fu-gmd">0</span>
+      </div>
       <div class="sidebar-item" onclick="showPanel('form-emergency')" id="nav-form-emergency">
         <span class="sidebar-icon">🚨</span> Emergency
         <span class="sidebar-count" id="cnt-emergency">0</span>
       </div>
       <div class="sidebar-item" onclick="showPanel('form-debond')" id="nav-form-debond">
-        <span class="sidebar-icon">✂️</span> Debond & Retainer
+        <span class="sidebar-icon">✂️</span> Debond &amp; Retainer
         <span class="sidebar-count" id="cnt-debond">0</span>
       </div>
     </div>
     <div class="sidebar-group">
       <div class="sidebar-group-label">System</div>
       <div class="sidebar-item" onclick="showPanel('reset')" id="nav-reset">
-        <span class="sidebar-icon">🔄</span> Reset & Export
+        <span class="sidebar-icon">🔄</span> Reset &amp; Export
       </div>
     </div>
   </nav>
 
   <!-- ══ MAIN ══ -->
   <div class="main">
-
-    <!-- panel topbar changes with active panel -->
     <div class="panel-topbar" id="panel-topbar">
       <div>
         <div class="panel-title" id="topbar-title">Clinic Settings</div>
         <div class="panel-desc" id="topbar-desc">General information displayed across all forms</div>
       </div>
-      <div id="topbar-actions"></div>
     </div>
 
     <div class="content-area">
 
-      <!-- ══════════════════════════
-           PANEL: CLINIC SETTINGS
-      ══════════════════════════ -->
+      <!-- ════════════════════════
+           PANEL: CLINIC
+      ════════════════════════ -->
       <div class="panel active" id="panel-clinic">
         <div class="info-box">
           <span>🔒</span>
-          <div><strong>Settings are local & private.</strong> All changes are saved only in <em>this browser</em> on <em>this device</em> via localStorage. Use Export/Import to transfer between devices.</div>
+          <div><strong>Settings are local &amp; private.</strong> Saved only in <em>this browser</em> via localStorage. Use Export/Import to transfer between devices.</div>
         </div>
 
         <div class="settings-card">
           <div class="settings-card-title">Clinic Information</div>
           <div class="setting-row">
             <div><div class="setting-label">Clinic / Practice Name</div><div class="setting-desc">Displayed in the form header subtitle</div></div>
-            <div class="setting-control"><input type="text" class="inline-input" id="clinic-name" placeholder="e.g. Dr. Ahmed Orthodontics" style="width:240px;"></div>
+            <input type="text" class="inline-input" id="clinic-name" placeholder="e.g. Dr. Ahmed Orthodontics" style="width:240px;">
           </div>
           <div class="setting-row">
             <div><div class="setting-label">Currency</div><div class="setting-desc">Used in all cost fields</div></div>
-            <div class="setting-control">
-              <select class="inline-input" id="clinic-currency" style="width:140px;">
-                <option value="SAR">SAR ﷼</option>
-                <option value="USD">USD $</option>
-                <option value="EUR">EUR €</option>
-                <option value="GBP">GBP £</option>
-                <option value="AED">AED د.إ</option>
-                <option value="KWD">KWD د.ك</option>
-                <option value="QAR">QAR ر.ق</option>
-              </select>
-            </div>
+            <select class="inline-input" id="clinic-currency" style="width:140px;">
+              <option value="SAR">SAR ﷼</option>
+              <option value="USD">USD $</option>
+              <option value="EUR">EUR €</option>
+              <option value="GBP">GBP £</option>
+              <option value="AED">AED د.إ</option>
+              <option value="KWD">KWD د.ك</option>
+              <option value="QAR">QAR ر.ق</option>
+            </select>
           </div>
           <div class="setting-row">
             <div><div class="setting-label">Default Appointment Interval</div><div class="setting-desc">Pre-fills the Next Visit field</div></div>
-            <div class="setting-control"><input type="text" class="inline-input" id="default-interval" placeholder="e.g. 4–6 weeks" style="width:180px;"></div>
-          </div>
-        </div>
-
-        <div class="settings-card">
-          <div class="settings-card-title">Tooth Notation System</div>
-          <div class="setting-row">
-            <div>
-              <div class="setting-label">Notation used across all dental charts and summaries</div>
-              <div class="setting-desc">Affects how tooth numbers are displayed and exported</div>
-            </div>
-            <div class="setting-control">
-              <div class="notation-picker">
-                <label class="notation-opt" id="notation-fdi-lbl">
-                  <input type="radio" name="notation" value="FDI" id="notation-fdi" onchange="updateNotationStyle()">
-                  FDI <span style="color:var(--grey-400);font-weight:400;">(11–48)</span>
-                </label>
-                <label class="notation-opt" id="notation-palmer-lbl">
-                  <input type="radio" name="notation" value="Palmer" id="notation-palmer" onchange="updateNotationStyle()">
-                  Palmer <span style="color:var(--grey-400);font-weight:400;">(UR1–LL8)</span>
-                </label>
-                <label class="notation-opt" id="notation-universal-lbl">
-                  <input type="radio" name="notation" value="Universal" id="notation-universal" onchange="updateNotationStyle()">
-                  Universal <span style="color:var(--grey-400);font-weight:400;">(1–32)</span>
-                </label>
-              </div>
-            </div>
+            <input type="text" class="inline-input" id="default-interval" placeholder="e.g. 4–6 weeks" style="width:180px;">
           </div>
         </div>
 
         <div class="settings-card">
           <div class="settings-card-title">Aseptic Statement</div>
-          <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:8px;">
+          <div class="setting-row col">
             <div>
               <div class="setting-label">Text shown in the aseptic confirmation row on all visit forms</div>
-              <div class="setting-desc">This statement appears at the bottom of Bond-Up, Follow-Up, Emergency and Debond forms</div>
+              <div class="setting-desc">Appears at the bottom of Bond-Up, Follow-Up, Emergency and Debond forms</div>
             </div>
-            <textarea id="aseptic-statement" style="width:100%;border:1.5px solid var(--grey-200);border-radius:8px;padding:9px 11px;font-family:DM Sans,sans-serif;font-size:0.84rem;outline:none;resize:vertical;min-height:64px;" placeholder="Aseptic technique statement..."></textarea>
+            <textarea id="aseptic-statement" class="inline-input" style="width:100%;margin-top:8px;" placeholder="Aseptic technique statement..."></textarea>
           </div>
         </div>
       </div>
 
-      <!-- ══════════════════════════
+      <!-- ════════════════════════
            PANEL: CLINICIANS
-      ══════════════════════════ -->
+      ════════════════════════ -->
       <div class="panel" id="panel-clinicians">
         <div class="card">
           <div class="card-header">
             <div class="card-title">👨‍⚕️ Clinician List</div>
-            <span class="badge badge-text">AUTOCOMPLETE</span>
+            <span class="badge badge-text">AUTOCOMPLETE SOURCE</span>
           </div>
           <div class="card-body">
-            <p style="font-size:0.8rem;color:var(--grey-500);margin-bottom:12px;">These names appear as suggestions in the Clinician field on every visit form.</p>
+            <p style="font-size:0.79rem;color:var(--grey-500);margin-bottom:11px;">These names appear as suggestions in the Clinician field on every visit form.</p>
             <div id="clinician-list"></div>
             <div class="add-row" style="margin-top:6px;">
               <input type="text" class="add-input" id="new-clinician" placeholder="Dr. New Name — press Enter to add">
@@ -566,9 +407,96 @@
         </div>
       </div>
 
-      <!-- ══════════════════════════
-           PANEL: WIRE OPTIONS
-      ══════════════════════════ -->
+      <!-- ════════════════════════
+           PANEL: NOTATION
+      ════════════════════════ -->
+      <div class="panel" id="panel-notation">
+        <div class="warn-box">
+          <span>⚠️</span>
+          <div><strong>Changing notation affects ALL tooth labels</strong> in the clinical forms instantly — mini charts, ligature selectors, TAD tooth pickers, emergency charts, and print summaries. Make sure all team members use the same notation.</div>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-title">Tooth Notation System</div>
+          <div class="setting-row col">
+            <div>
+              <div class="setting-label">Select the notation used across all dental charts and summaries</div>
+              <div class="setting-desc">This controls how tooth numbers appear in mini-charts, summaries, and printed reports. Affects: ligature selectors, rebond charts, TAD tooth pickers, emergency charts, dental chart labels.</div>
+            </div>
+            <div style="margin-top:12px;">
+              <div class="notation-picker">
+                <label class="notation-opt" id="notation-fdi-lbl">
+                  <input type="radio" name="notation" value="FDI" id="notation-fdi" onchange="updateNotationStyle(); broadcastNotation();">
+                  <span>🌍 FDI &nbsp;<span style="color:var(--grey-400);font-weight:400;font-size:0.75rem;">(11–48)</span></span>
+                </label>
+                <label class="notation-opt" id="notation-palmer-lbl">
+                  <input type="radio" name="notation" value="Palmer" id="notation-palmer" onchange="updateNotationStyle(); broadcastNotation();">
+                  <span>🇬🇧 Palmer &nbsp;<span style="color:var(--grey-400);font-weight:400;font-size:0.75rem;">(UR1–LL8)</span></span>
+                </label>
+                <label class="notation-opt" id="notation-universal-lbl">
+                  <input type="radio" name="notation" value="Universal" id="notation-universal" onchange="updateNotationStyle(); broadcastNotation();">
+                  <span>🇺🇸 Universal &nbsp;<span style="color:var(--grey-400);font-weight:400;font-size:0.75rem;">(1–32)</span></span>
+                </label>
+              </div>
+
+              <!-- Live preview -->
+              <div style="margin-top:14px;">
+                <div style="font-size:0.7rem;font-weight:700;color:var(--grey-500);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">Live Preview — Upper Arch (Right → Left)</div>
+                <div class="notation-demo" id="notation-demo-upper"></div>
+                <div style="font-size:0.7rem;font-weight:700;color:var(--grey-500);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;margin-top:10px;">Lower Arch (Right → Left)</div>
+                <div class="notation-demo" id="notation-demo-lower"></div>
+              </div>
+
+              <div style="margin-top:14px;padding:11px 13px;background:var(--green-light);border:1px solid #a5d6a7;border-radius:8px;font-size:0.81rem;color:var(--green);">
+                ✅ <strong>No restart needed.</strong> The notation change broadcasts to index.html immediately via localStorage. Any open form tab will update its tooth labels within seconds.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-title">Notation Reference Guide</div>
+          <div style="padding:13px 15px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px;">
+            <div style="background:var(--grey-50);border:1px solid var(--grey-200);border-radius:8px;padding:11px;">
+              <div style="font-size:0.71rem;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">FDI / ISO 3950</div>
+              <div style="font-size:0.78rem;color:var(--text);line-height:1.7;">
+                Two-digit system. First digit = quadrant (1–4), second = tooth position (1–8).<br>
+                <strong>11–18</strong> = Upper Right<br>
+                <strong>21–28</strong> = Upper Left<br>
+                <strong>31–38</strong> = Lower Left<br>
+                <strong>41–48</strong> = Lower Right<br>
+                <span style="color:var(--grey-500);">Most common internationally &amp; in Gulf.</span>
+              </div>
+            </div>
+            <div style="background:var(--grey-50);border:1px solid var(--grey-200);border-radius:8px;padding:11px;">
+              <div style="font-size:0.71rem;font-weight:700;color:#3355cc;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Palmer Notation</div>
+              <div style="font-size:0.78rem;color:var(--text);line-height:1.7;">
+                Letter + number in a quadrant grid.<br>
+                <strong>UR1–UR8</strong> = Upper Right<br>
+                <strong>UL1–UL8</strong> = Upper Left<br>
+                <strong>LL1–LL8</strong> = Lower Left<br>
+                <strong>LR1–LR8</strong> = Lower Right<br>
+                <span style="color:var(--grey-500);">Common in UK &amp; Commonwealth countries.</span>
+              </div>
+            </div>
+            <div style="background:var(--grey-50);border:1px solid var(--grey-200);border-radius:8px;padding:11px;">
+              <div style="font-size:0.71rem;font-weight:700;color:#6a1f9e;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Universal (ADA)</div>
+              <div style="font-size:0.78rem;color:var(--text);line-height:1.7;">
+                Sequential 1–32, starting upper right.<br>
+                <strong>1–8</strong> = Upper Right (8→1)<br>
+                <strong>9–16</strong> = Upper Left (1→8)<br>
+                <strong>17–24</strong> = Lower Left (8→1)<br>
+                <strong>25–32</strong> = Lower Right (1→8)<br>
+                <span style="color:var(--grey-500);">Standard in USA and some other countries.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════
+           PANEL: WIRES
+      ════════════════════════ -->
       <div class="panel" id="panel-wires">
         <div class="info-box">
           <span>ℹ️</span>
@@ -604,34 +532,21 @@
         </div>
       </div>
 
-      <!-- ══════════════════════════
-           PANEL: FORM FIELDS (all forms share this template)
-      ══════════════════════════ -->
-      <div class="panel" id="panel-form-exam">
-        <div id="fields-exam"></div>
-      </div>
-      <div class="panel" id="panel-form-plan">
-        <div id="fields-plan"></div>
-      </div>
-      <div class="panel" id="panel-form-bond">
-        <div id="fields-bond"></div>
-      </div>
-      <div class="panel" id="panel-form-fu-fixed">
-        <div id="fields-fu-fixed"></div>
-      </div>
-      <div class="panel" id="panel-form-fu-aligner">
-        <div id="fields-fu-aligner"></div>
-      </div>
-      <div class="panel" id="panel-form-emergency">
-        <div id="fields-emergency"></div>
-      </div>
-      <div class="panel" id="panel-form-debond">
-        <div id="fields-debond"></div>
-      </div>
+      <!-- ════════════════════════
+           FORM FIELD PANELS (dynamic)
+      ════════════════════════ -->
+      <div class="panel" id="panel-form-exam"><div id="fields-exam"></div></div>
+      <div class="panel" id="panel-form-plan"><div id="fields-plan"></div></div>
+      <div class="panel" id="panel-form-bond"><div id="fields-bond"></div></div>
+      <div class="panel" id="panel-form-fu-fixed"><div id="fields-fu-fixed"></div></div>
+      <div class="panel" id="panel-form-fu-aligner"><div id="fields-fu-aligner"></div></div>
+      <div class="panel" id="panel-form-fu-gmd"><div id="fields-fu-gmd"></div></div>
+      <div class="panel" id="panel-form-emergency"><div id="fields-emergency"></div></div>
+      <div class="panel" id="panel-form-debond"><div id="fields-debond"></div></div>
 
-      <!-- ══════════════════════════
-           PANEL: RESET & EXPORT
-      ══════════════════════════ -->
+      <!-- ════════════════════════
+           PANEL: RESET
+      ════════════════════════ -->
       <div class="panel" id="panel-reset">
         <div class="io-card">
           <h3>📤 Export Current Settings</h3>
@@ -650,14 +565,14 @@
         </div>
         <div class="io-card">
           <h3>🔄 Reset to Factory Defaults</h3>
-          <p>Restore all field options to their original values. <strong>Your saved form drafts (patient data) will not be affected.</strong></p>
+          <p>Restore all field options to their original values. <strong>Your saved patient form drafts will not be affected.</strong></p>
           <div class="io-row">
             <button class="btn btn-danger" onclick="resetToDefaults()">🔄 Reset All Options to Defaults</button>
           </div>
         </div>
         <div class="io-card" style="border-color:#f5a0a0;">
           <h3>🗑 Clear All Saved Form Drafts</h3>
-          <p style="color:var(--red);">⚠️ This will permanently erase all patient data saved in this browser (clinical record drafts). This <strong>cannot be undone</strong>.</p>
+          <p style="color:var(--red);">⚠️ This will permanently erase all patient data saved in this browser. <strong>Cannot be undone.</strong></p>
           <div class="io-row">
             <button class="btn btn-danger" onclick="clearAllDrafts()">🗑 Clear All Patient Form Data</button>
           </div>
@@ -677,19 +592,46 @@
 <footer class="page-footer">
   <div class="footer-brand">
     <div class="footer-icon">⚙️</div>
-    <span class="footer-text">Orthodontic Records — Admin Panel</span>
+    <span class="footer-text">EasyOrtho — Admin Panel</span>
   </div>
-  <a href="mailto:homam.alsmman@gmail.com" class="footer-author" title="Contact: homam.alsmman@gmail.com">
-    <span style="font-size:14px;">🩺</span>
+  <div class="footer-author">
+    <span>🩺</span>
     <div>
       <span class="footer-author-name">Dr. Mohammed Homam Alsamman</span>
       <span class="footer-author-label">Concept, Design &amp; Development</span>
     </div>
-  </a>
+  </div>
   <span class="footer-copy">© 2025 All Rights Reserved</span>
 </footer>
 
 <script>
+// ══════════════════════════════════════════════════════════════
+// NOTATION MAPS — must match index.html exactly
+// ══════════════════════════════════════════════════════════════
+const PALMER_MAP = {
+  18:'UR8',17:'UR7',16:'UR6',15:'UR5',14:'UR4',13:'UR3',12:'UR2',11:'UR1',
+  21:'UL1',22:'UL2',23:'UL3',24:'UL4',25:'UL5',26:'UL6',27:'UL7',28:'UL8',
+  48:'LR8',47:'LR7',46:'LR6',45:'LR5',44:'LR4',43:'LR3',42:'LR2',41:'LR1',
+  31:'LL1',32:'LL2',33:'LL3',34:'LL4',35:'LL5',36:'LL6',37:'LL7',38:'LL8'
+};
+const UNIVERSAL_MAP = {
+  18:1, 17:2, 16:3, 15:4, 14:5, 13:6, 12:7, 11:8,
+  21:9, 22:10,23:11,24:12,25:13,26:14,27:15,28:16,
+  38:17,37:18,36:19,35:20,34:21,33:22,32:23,31:24,
+  41:25,42:26,43:27,44:28,45:29,46:30,47:31,48:32
+};
+const UPPER_TEETH = [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28];
+const LOWER_TEETH = [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38];
+
+function toothLabel(num, notation) {
+  const n = notation || schema.notation || 'FDI';
+  if (n === 'Palmer')    return PALMER_MAP[num]    || String(num);
+  if (n === 'Universal') return UNIVERSAL_MAP[num] || String(num);
+  return String(num);
+}
+
+// ══════════════════════════════════════════════════════════════
+// DEFAULT SCHEMA — mirrors all form fields in index.html
 // ══════════════════════════════════════════════════════════════
 const DEFAULT_SCHEMA = {
   wireSizes: ['0.012','0.014','0.016','0.018','0.020','0.016×0.016','0.016×0.022','0.017×0.025','0.018×0.025','0.019×0.025','0.021×0.025'],
@@ -739,71 +681,104 @@ const DEFAULT_SCHEMA = {
       { id:'cc',            label:'Chief Complaints',          type:'check',  options:['Crowding','Spacing','Protrusion','Deep bite','Open bite','Crossbite','Smile aesthetics','Facial profile','Functional issue','Missing teeth','TMJ / Pain','Referral'] },
     ],
     plan: [
-      { id:'plan-tx-type',       label:'Treatment Type',         type:'select', options:['Non-extraction camouflage','Extraction treatment','Non-extraction expansion','Surgical-orthodontic','Limited / Interceptive','Phase I (Growth modification)','Phase II (Comprehensive)'] },
-      { id:'plan-slot',          label:'Slot Size',              type:'radio',  options:['0.022×0.028','0.018×0.025'] },
-      { id:'plan-rx',            label:'Prescription',           type:'radio',  options:['MBT','Roth','SWA','Damon'] },
-      { id:'plan-brand',         label:'Bracket Brand',          type:'radio',  options:['OrthoTech','Pinnacle','3M','Dentsply','Other'] },
-      { id:'plan-arch-cov',      label:'Arch Coverage',          type:'radio',  options:['Upper 6-6 & Lower 6-6','Upper 7-7 & Lower 7-7','Upper only','Lower only'] },
-      { id:'plan-anch',          label:'Anchorage Req.',         type:'radio',  options:['Maximum','Moderate','Minimum'] },
-      { id:'plan-ext',           label:'Extractions',            type:'radio',  options:['None','Upper 4s','Upper 5s','Lower 4s','Lower 5s','Upper & Lower 4s','Other'] },
-      { id:'plan-aligner-brand', label:'Aligner Brand',          type:'select', options:['Invisalign','ClearCorrect','OrthoSnap','Spark','Angel Aligner','Other'] },
-      { id:'plan-aligner-scope', label:'Aligner Scope',          type:'radio',  options:['Comprehensive','Limited','Lite'] },
-      { id:'plan-midline',       label:'Midline Displacement',   type:'radio',  options:['Coincident','Upper deviated','Lower deviated','Both deviated'] },
-      { id:'plan-lip-prom',      label:'Lip Prominence',         type:'radio',  options:['Not a concern','Reduce','Maintain','Increase'] },
-      { id:'plan-sym',           label:'Facial Symmetry Goal',   type:'radio',  options:['Maintain','Improve','Accept asymmetry'] },
-      { id:'plan-smile',         label:'Smile Line',             type:'radio',  options:['Maintain','Improve - consonant arc','Reduce gummy smile'] },
-      { id:'plan-appliance-type',label:'Appliance Type',         type:'radio',  options:['fixed','aligner'] },
+      { id:'plan-tx-type',        label:'Treatment Type',         type:'select', options:['Non-extraction camouflage','Extraction treatment','Non-extraction expansion','Surgical-orthodontic','Limited / Interceptive','Phase I (Growth modification)','Phase II (Comprehensive)'] },
+      { id:'plan-slot',           label:'Slot Size',              type:'radio',  options:['0.022×0.028','0.018×0.025'] },
+      { id:'plan-rx',             label:'Prescription',           type:'radio',  options:['MBT','Roth','SWA','Damon'] },
+      { id:'plan-brand',          label:'Bracket Brand',          type:'radio',  options:['OrthoTech','Pinnacle','3M','Dentsply','Other'] },
+      { id:'plan-arch-cov',       label:'Arch Coverage',          type:'radio',  options:['Upper 6-6 & Lower 6-6','Upper 7-7 & Lower 7-7','Upper only','Lower only'] },
+      { id:'plan-anch',           label:'Anchorage Req.',         type:'radio',  options:['Maximum','Moderate','Minimum'] },
+      { id:'plan-ext',            label:'Extractions',            type:'radio',  options:['None','Upper 4s','Upper 5s','Lower 4s','Lower 5s','Upper & Lower 4s','Other'] },
+      { id:'plan-aligner-brand',  label:'Aligner Brand',          type:'select', options:['Invisalign','ClearCorrect','OrthoSnap','Spark','Angel Aligner','Other'] },
+      { id:'plan-aligner-scope',  label:'Aligner Scope',          type:'radio',  options:['Comprehensive','Limited','Lite'] },
+      { id:'plan-midline',        label:'Midline Displacement',   type:'radio',  options:['Coincident','Upper deviated','Lower deviated','Both deviated'] },
+      { id:'plan-lip-prom',       label:'Lip Prominence',         type:'radio',  options:['Not a concern','Reduce','Maintain','Increase'] },
+      { id:'plan-sym',            label:'Facial Symmetry Goal',   type:'radio',  options:['Maintain','Improve','Accept asymmetry'] },
+      { id:'plan-smile',          label:'Smile Line',             type:'radio',  options:['Maintain','Improve - consonant arc','Reduce gummy smile'] },
+      { id:'plan-appliance-type', label:'Appliance Type',         type:'radio',  options:['fixed','aligner','gmd'] },
     ],
     bond: [
-      { id:'bond-arch',        label:'Arch Coverage (Fixed)',  type:'radio',  options:['Upper 6-6 & Lower 6-6','Upper 7-7 & Lower 7-7','Upper arch only','Lower arch only'] },
-      { id:'bond-rx',          label:'Prescription',          type:'radio',  options:['MBT','Roth','SWA'] },
-      { id:'bond-brand',       label:'Brand',                 type:'radio',  options:['OrthoTech','Pinnacle','3M','Other'] },
-      { id:'bond-aligner-wear',label:'Aligner Wear Protocol', type:'radio',  options:['22hrs/day','20hrs/day','Every 1 week','Every 2 weeks'] },
-      { id:'bond-ipr',         label:'IPR Status',            type:'radio',  options:['None at this visit','Done — Stage 1','Planned — future visit'] },
-      { id:'bond-oh',          label:'Oral Hygiene',          type:'radio',  options:['Good','Fair','Poor'] },
-      { id:'bond-elastic-config',label:'Elastic Configuration',type:'radio',  options:['symmetric','asymmetric'] },
-      { id:'bond-elastic',     label:'Elastic Type',          type:'radio',  options:['None','Class II','Class III','Vertical','Box','Cross'] },
-      { id:'bond-el-size',     label:'Elastic Size',          type:'radio',  options:['1/8"','3/16"','1/4"','5/16"','3/8"'] },
-      { id:'bond-el-force',    label:'Elastic Force',         type:'radio',  options:['Light','Medium','Heavy'] },
-      { id:'bond-type',        label:'Bond-Up Type',          type:'radio',  options:['fixed','aligner'] },
+      { id:'bond-arch',          label:'Arch Coverage (Fixed)',   type:'radio',  options:['Upper 6-6 & Lower 6-6','Upper 7-7 & Lower 7-7','Upper arch only','Lower arch only'] },
+      { id:'bond-rx',            label:'Prescription',            type:'radio',  options:['MBT','Roth','SWA'] },
+      { id:'bond-brand',         label:'Brand',                   type:'radio',  options:['OrthoTech','Pinnacle','3M','Other'] },
+      { id:'bond-aligner-wear',  label:'Aligner Wear Protocol',   type:'radio',  options:['22hrs/day','20hrs/day','Every 1 week','Every 2 weeks'] },
+      { id:'bond-ipr',           label:'IPR Status',              type:'radio',  options:['None at this visit','Done — Stage 1','Planned — future visit'] },
+      { id:'bond-oh',            label:'Oral Hygiene',            type:'radio',  options:['Good','Fair','Poor'] },
+      { id:'bond-elastic-config',label:'Elastic Configuration',   type:'radio',  options:['symmetric','asymmetric'] },
+      { id:'bond-elastic',       label:'Elastic Type',            type:'radio',  options:['None','Class II','Class III','Vertical','Box','Cross'] },
+      { id:'bond-el-size',       label:'Elastic Size',            type:'radio',  options:['1/8"','3/16"','1/4"','5/16"','3/8"'] },
+      { id:'bond-el-force',      label:'Elastic Force',           type:'radio',  options:['Light','Medium','Heavy'] },
+      { id:'bond-type',          label:'Bond-Up Type',            type:'radio',  options:['fixed','aligner'] },
     ],
     'fu-fixed': [
-      { id:'fuf-rebond-reason',label:'Rebond Reason',         type:'radio',  options:['Debond — traumatic','Debond — poor OH','Debond — bond failure','Broken — appliance','Repositioned'] },
-      { id:'fuf-lig-upper',   label:'Ligature — Upper',       type:'radio',  options:['Elastic modules','Elastic chain','Self-ligating'] },
-      { id:'fuf-lig-lower',   label:'Ligature — Lower',       type:'radio',  options:['Elastic modules','Elastic chain','Self-ligating'] },
-      { id:'fuf-stage',       label:'Treatment Stage',        type:'radio',  options:['Alignment & leveling','Space closure','OJ correction','Finishing'] },
-      { id:'fuf-elastic',     label:'Elastic Type',           type:'radio',  options:['None','Class II','Class III','Vertical','Box','Triangle','Cross'] },
-      { id:'fuf-el-size',     label:'Elastic Size',           type:'radio',  options:['1/8"','3/16"','1/4"','5/16"','3/8"'] },
-      { id:'fuf-el-force',    label:'Elastic Force',          type:'radio',  options:['Light','Medium','Heavy'] },
-      { id:'fuf-align-prog',  label:'Alignment Progress',     type:'radio',  options:['Progressing well','Satisfactory','Slow — monitor','Plateau — intervention needed'] },
-      { id:'fuf-compliance',  label:'Patient Compliance',     type:'radio',  options:['Excellent','Good','Fair','Poor'] },
-      { id:'fuf-oh',          label:'Oral Hygiene',           type:'radio',  options:['Good','Fair','Poor'] },
+      { id:'fuf-rebond-reason',  label:'Rebond Reason',           type:'radio',  options:['Debond — traumatic','Debond — poor OH','Debond — bond failure','Broken — appliance','Repositioned'] },
+      { id:'fuf-lig-upper',      label:'Ligature — Upper',        type:'radio',  options:['Elastic modules','Elastic chain','Self-ligating'] },
+      { id:'fuf-lig-lower',      label:'Ligature — Lower',        type:'radio',  options:['Elastic modules','Elastic chain','Self-ligating'] },
+      { id:'fuf-stage',          label:'Treatment Stage',         type:'radio',  options:['Alignment & leveling','Space closure','OJ correction','Finishing'] },
+      { id:'fuf-elastic',        label:'Elastic Type',            type:'radio',  options:['None','Class II','Class III','Vertical','Box','Triangle','Cross'] },
+      { id:'fuf-el-size',        label:'Elastic Size',            type:'radio',  options:['1/8"','3/16"','1/4"','5/16"','3/8"'] },
+      { id:'fuf-el-force',       label:'Elastic Force',           type:'radio',  options:['Light','Medium','Heavy'] },
+      { id:'fuf-align-prog',     label:'Alignment Progress',      type:'radio',  options:['Progressing well','Satisfactory','Slow — monitor','Plateau — intervention needed'] },
+      { id:'fuf-compliance',     label:'Patient Compliance',      type:'radio',  options:['Excellent','Good','Fair','Poor'] },
+      { id:'fuf-oh',             label:'Oral Hygiene',            type:'radio',  options:['Good','Fair','Poor'] },
     ],
     'fu-aligner': [
-      { id:'fua-tracking',    label:'Tracking Assessment',    type:'radio',  options:['Full tracking — excellent','Mostly tracking — minor gaps','Poor tracking — refinement needed','Refinement planned'] },
-      { id:'fua-ipr',         label:'IPR Status',             type:'radio',  options:['None','Done this visit','Partially done'] },
-      { id:'fua-elastic',     label:'Elastic Type',           type:'radio',  options:['None','Class II','Class III','Vertical','Box','Cross'] },
-      { id:'fua-el-size',     label:'Elastic Size',           type:'radio',  options:['1/8"','3/16"','1/4"','5/16"','3/8"'] },
-      { id:'fua-el-force',    label:'Elastic Force',          type:'radio',  options:['Light','Medium','Heavy'] },
-      { id:'fua-oh',          label:'Oral Hygiene',           type:'radio',  options:['Good','Fair','Poor'] },
-      { id:'fua-wear-comply', label:'Wear Compliance',        type:'radio',  options:['22+ hrs/day','18–22 hrs/day','Under 18 hrs'] },
+      { id:'fua-tracking',       label:'Tracking Assessment',     type:'radio',  options:['Full tracking — excellent','Mostly tracking — minor gaps','Poor tracking — refinement needed','Refinement planned'] },
+      { id:'fua-ipr',            label:'IPR Status',              type:'radio',  options:['None','Done this visit','Partially done'] },
+      { id:'fua-elastic',        label:'Elastic Type',            type:'radio',  options:['None','Class II','Class III','Vertical','Box','Cross'] },
+      { id:'fua-el-size',        label:'Elastic Size',            type:'radio',  options:['1/8"','3/16"','1/4"','5/16"','3/8"'] },
+      { id:'fua-el-force',       label:'Elastic Force',           type:'radio',  options:['Light','Medium','Heavy'] },
+      { id:'fua-oh',             label:'Oral Hygiene',            type:'radio',  options:['Good','Fair','Poor'] },
+      { id:'fua-wear-comply',    label:'Wear Compliance',         type:'radio',  options:['22+ hrs/day','18–22 hrs/day','Under 18 hrs'] },
+    ],
+    'fu-gmd': [
+      { id:'fug-compliance',     label:'Wear Compliance',         type:'radio',  options:['Excellent — wearing as prescribed','Good — minor lapses','Fair — wearing <12 hrs/day','Poor — rarely wearing','Not wearing at all'] },
+      { id:'fug-comfort',        label:'Patient Comfort',         type:'radio',  options:['Comfortable','Mild discomfort','Painful — adjustment needed'] },
+      { id:'fug-skeletal-resp',  label:'Skeletal Response',       type:'radio',  options:['Good skeletal response','Predominantly dental response','Mixed skeletal + dental','Minimal response — review plan'] },
+      { id:'fug-soft-tissue',    label:'Soft Tissue Response',    type:'radio',  options:['Improving — lip position improving','Static — no change yet','Regressed'] },
+      { id:'fug-overall',        label:'Overall Progress',        type:'radio',  options:['On track — progressing well','Slower than expected — monitor','Plateau — intervention needed'] },
+      { id:'fug-oh',             label:'Oral Hygiene',            type:'radio',  options:['Good','Fair','Poor — reinforced'] },
+      { id:'fug-decision',       label:'Transition Decision',     type:'radio',  options:['Continue GMD — objectives not yet achieved','Overcorrection phase — continue GMD','Phase I complete — transition to fixed appliance','Phase I complete — transition to clear aligners','Phase I complete — retention / review only','Discontinue — non-compliance','Refer — surgical option to be discussed'] },
     ],
     emergency: [
-      { id:'em-pills',        label:'Emergency Type Pills',   type:'pills',  options:['De-bonded bracket','De-bonded molar tube','De-bonded retainer','Loose band','Excess / poking wire','Broken archwire','Lost aligner','Broken attachment','Lost elastic chain','TAD / mini-screw issue','Pain / discomfort','Trauma','Soft tissue irritation','Other'] },
-      { id:'em-duration',     label:'Duration of Problem',    type:'radio',  options:['Today','1–2 days','Few days','Week+'] },
-      { id:'em-return',       label:'Return to Visits',       type:'radio',  options:['Resume normal schedule','Expedited follow-up needed'] },
-      { id:'em-wire-arch',    label:'Wire Arch (Emergency)',  type:'radio',  options:['Upper only','Lower only','Both arches','N/A'] },
+      { id:'em-pills',           label:'Emergency Type Pills',    type:'pills',  options:['De-bonded bracket','De-bonded molar tube','De-bonded retainer','Loose band','Excess / poking wire','Broken archwire','Lost aligner','Broken attachment','Lost elastic chain','TAD / mini-screw issue','Pain / discomfort','Trauma','Soft tissue irritation','Other'] },
+      { id:'em-duration',        label:'Duration of Problem',     type:'radio',  options:['Today','1–2 days','Few days','Week+'] },
+      { id:'em-return',          label:'Return to Visits',        type:'radio',  options:['Resume normal schedule','Expedited follow-up needed'] },
+      { id:'em-wire-arch',       label:'Wire Arch (Emergency)',   type:'radio',  options:['Upper only','Lower only','Both arches','N/A'] },
     ],
     debond: [
-      { id:'db-enamel',       label:'Enamel Surface',               type:'radio',  options:['Smooth — no irregularities','Minor composite remnants — polished','WSL noted — monitor','Enamel crack — documented'] },
-      { id:'db-fr-upper',     label:'Fixed Retainer Upper',         type:'radio',  options:['None','3-3 multi-stranded 4×0.009"','3-3 braided 0.010×0.028"','6-6 bonded'] },
-      { id:'db-fr-lower',     label:'Fixed Retainer Lower',         type:'radio',  options:['None','3-3 multi-stranded 4×0.009"','3-3 braided 0.010×0.028"','6-6 bonded'] },
-      { id:'db-rr-wear',      label:'Removable Retainer Wear',      type:'radio',  options:['Full-time (22 hrs/day) — 3 months then nights','Nights only — indefinitely','Fixed retainer only — no removable'] },
-      { id:'db-rr-arch',      label:'Removable Retainer Arch',      type:'radio',  options:['Upper & Lower','Upper only','Lower only','N/A'] },
-      { id:'db-outcome',      label:'Treatment Objectives',         type:'radio',  options:['Fully achieved','Mostly achieved','Partially achieved — compromise'] },
-      { id:'db-oh',           label:'Oral Hygiene',                  type:'radio',  options:['Good','Fair','Poor'] },
+      { id:'db-enamel',          label:'Enamel Surface',          type:'radio',  options:['Smooth — no irregularities','Minor composite remnants — polished','WSL noted — monitor','Enamel crack — documented'] },
+      { id:'db-fr-upper',        label:'Fixed Retainer Upper',    type:'radio',  options:['None','3-3 multi-stranded 4×0.009"','3-3 braided 0.010×0.028"','6-6 bonded'] },
+      { id:'db-fr-lower',        label:'Fixed Retainer Lower',    type:'radio',  options:['None','3-3 multi-stranded 4×0.009"','3-3 braided 0.010×0.028"','6-6 bonded'] },
+      { id:'db-rr-wear',         label:'Removable Retainer Wear', type:'radio',  options:['Full-time (22 hrs/day) — 3 months then nights','Nights only — indefinitely','Fixed retainer only — no removable'] },
+      { id:'db-rr-arch',         label:'Removable Retainer Arch', type:'radio',  options:['Upper & Lower','Upper only','Lower only','N/A'] },
+      { id:'db-outcome',         label:'Treatment Objectives',    type:'radio',  options:['Fully achieved','Mostly achieved','Partially achieved — compromise'] },
+      { id:'db-oh',              label:'Oral Hygiene',            type:'radio',  options:['Good','Fair','Poor'] },
     ],
   }
+};
+
+// ══════════════════════════════════════════════════════════════
+// FORM KEYS — matches all forms in index.html
+// ══════════════════════════════════════════════════════════════
+const FORM_KEYS = ['exam','plan','bond','fu-fixed','fu-aligner','fu-gmd','emergency','debond'];
+
+// ══════════════════════════════════════════════════════════════
+// PANEL METADATA
+// ══════════════════════════════════════════════════════════════
+const PANEL_META = {
+  'clinic':          { title:'Clinic Settings',           desc:'General information displayed across all forms' },
+  'clinicians':      { title:'Clinicians',                desc:'Names used as autocomplete suggestions in the Clinician field' },
+  'notation':        { title:'Tooth Notation System',     desc:'Control how tooth numbers are displayed in charts, summaries, and printed reports' },
+  'wires':           { title:'Wire Options',              desc:'Archwire sizes and materials shown in wire chip selectors' },
+  'form-exam':       { title:'Examination Form',          desc:'Edit radio groups, dropdowns and checkbox lists in the Examination tab' },
+  'form-plan':       { title:'Treatment Plan Form',       desc:'Edit option lists for the Treatment Plan tab' },
+  'form-bond':       { title:'Bond-Up Form',              desc:'Edit options for the bonding session tab' },
+  'form-fu-fixed':   { title:'Fixed Follow-Up Form',      desc:'Edit options for fixed appliance review visits' },
+  'form-fu-aligner': { title:'Aligner Follow-Up Form',    desc:'Edit options for clear aligner review visits' },
+  'form-fu-gmd':     { title:'GMD Follow-Up Form',        desc:'Edit options for growth modification device review visits' },
+  'form-emergency':  { title:'Emergency Visit Form',      desc:'Edit emergency type pills and treatment options' },
+  'form-debond':     { title:'Debond & Retainer Form',    desc:'Edit options for debonding and retention visits' },
+  'reset':           { title:'Reset & Export',            desc:'Export, import, or restore factory settings' },
 };
 
 // ══════════════════════════════════════════════════════════════
@@ -813,11 +788,15 @@ let schema = deepClone(DEFAULT_SCHEMA);
 
 function deepClone(obj) { return JSON.parse(JSON.stringify(obj)); }
 
+// FIX: deepMerge now properly handles arrays (replaces, doesn't try to merge)
 function deepMerge(target, source) {
   if (!source) return target;
   Object.keys(source).forEach(k => {
-    if (typeof source[k] === 'object' && !Array.isArray(source[k]) && source[k] !== null) {
-      if (!target[k]) target[k] = {};
+    if (Array.isArray(source[k])) {
+      // Arrays are always replaced, never merged element-by-element
+      target[k] = source[k];
+    } else if (typeof source[k] === 'object' && source[k] !== null) {
+      if (!target[k] || typeof target[k] !== 'object') target[k] = {};
       deepMerge(target[k], source[k]);
     } else {
       target[k] = source[k];
@@ -825,23 +804,6 @@ function deepMerge(target, source) {
   });
   return target;
 }
-
-// ══════════════════════════════════════════════════════════════
-// PANEL METADATA
-// ══════════════════════════════════════════════════════════════
-const PANEL_META = {
-  'clinic':         { title: 'Clinic Settings',          desc: 'General information displayed across all forms' },
-  'clinicians':     { title: 'Clinicians',               desc: 'Names used as autocomplete suggestions in the Clinician field' },
-  'wires':          { title: 'Wire Options',             desc: 'Archwire sizes and materials shown in wire chip selectors' },
-  'form-exam':      { title: 'Examination Form',        desc: 'Edit all radio groups, dropdowns and checkbox lists in the Examination tab' },
-  'form-plan':      { title: 'Treatment Plan Form',     desc: 'Edit option lists for the Treatment Plan tab' },
-  'form-bond':      { title: 'Bond-Up Form',            desc: 'Edit options for the bonding session tab' },
-  'form-fu-fixed':  { title: 'Fixed Follow-Up Form',   desc: 'Edit options for fixed appliance review visits' },
-  'form-fu-aligner':{ title: 'Aligner Follow-Up Form', desc: 'Edit options for clear aligner review visits' },
-  'form-emergency': { title: 'Emergency Visit Form',   desc: 'Edit emergency type pills and treatment options' },
-  'form-debond':    { title: 'Debond & Retainer Form', desc: 'Edit options for debonding and retention visits' },
-  'reset':          { title: 'Reset & Export',          desc: 'Export, import, or restore factory settings' },
-};
 
 // ══════════════════════════════════════════════════════════════
 // NAVIGATION
@@ -856,6 +818,8 @@ function showPanel(id) {
     document.getElementById('topbar-title').textContent = meta.title;
     document.getElementById('topbar-desc').textContent  = meta.desc;
   }
+  // When switching to notation panel, refresh the demo
+  if (id === 'notation') renderNotationDemo();
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -867,45 +831,85 @@ function init() {
     try {
       const parsed = JSON.parse(saved);
       schema = deepMerge(deepClone(DEFAULT_SCHEMA), parsed);
-    } catch(e) {}
+    } catch(e) { console.warn('Admin schema parse error:', e); }
   }
   loadClinicSettings();
   loadClinicians();
   loadWireOptions();
   renderAllFormPanels();
   updateAllCounts();
+  renderNotationDemo();
 }
 
 // ══════════════════════════════════════════════════════════════
 // CLINIC SETTINGS
 // ══════════════════════════════════════════════════════════════
 function loadClinicSettings() {
-  document.getElementById('clinic-name').value     = schema.clinicName || '';
-  document.getElementById('clinic-currency').value = schema.currency   || 'SAR';
-  document.getElementById('default-interval').value= schema.defaultInterval || '';
-  document.getElementById('aseptic-statement').value = schema.asepticStatement || '';
+  document.getElementById('clinic-name').value      = schema.clinicName      || '';
+  document.getElementById('clinic-currency').value  = schema.currency        || 'SAR';
+  document.getElementById('default-interval').value = schema.defaultInterval || '';
+  document.getElementById('aseptic-statement').value= schema.asepticStatement|| '';
+
+  // Notation
   const nota = schema.notation || 'FDI';
-  const notaKey = nota.toLowerCase();
-  const el = document.getElementById('notation-' + notaKey);
+  const notaLower = nota.toLowerCase();
+  const el = document.getElementById('notation-' + notaLower);
   if (el) { el.checked = true; updateNotationStyle(); }
+}
+
+function collectClinicSettings() {
+  schema.clinicName       = document.getElementById('clinic-name').value.trim();
+  schema.currency         = document.getElementById('clinic-currency').value;
+  schema.defaultInterval  = document.getElementById('default-interval').value.trim();
+  schema.asepticStatement = document.getElementById('aseptic-statement').value.trim();
+  const notaEl = document.querySelector('[name="notation"]:checked');
+  schema.notation = notaEl ? notaEl.value : 'FDI';
 }
 
 function updateNotationStyle() {
   ['fdi','palmer','universal'].forEach(n => {
-    const lbl = document.getElementById('notation-'+n+'-lbl');
-    const inp = document.getElementById('notation-'+n);
+    const lbl = document.getElementById('notation-' + n + '-lbl');
+    const inp = document.getElementById('notation-' + n);
     if (lbl && inp) lbl.classList.toggle('selected', inp.checked);
   });
+  renderNotationDemo();
 }
 
-function collectClinicSettings() {
-  schema.clinicName      = document.getElementById('clinic-name').value.trim();
-  schema.currency        = document.getElementById('clinic-currency').value;
-  schema.defaultInterval = document.getElementById('default-interval').value.trim();
-  schema.asepticStatement= document.getElementById('aseptic-statement').value.trim();
-  const notaEl = document.querySelector('[name="notation"]:checked');
-  schema.notation = notaEl ? notaEl.value : 'FDI';
-  localStorage.setItem('ortho_notation', schema.notation);
+// FIX: Broadcast notation change to index.html immediately
+function broadcastNotation() {
+  const el = document.querySelector('[name="notation"]:checked');
+  if (!el) return;
+  schema.notation = el.value;
+  // Write to the dedicated key that index.html reads
+  localStorage.setItem('ortho_notation', el.value);
+  // Also trigger the admin update event so index.html reapplies schema
+  localStorage.setItem('ortho_admin_update', Date.now().toString());
+}
+
+// ══════════════════════════════════════════════════════════════
+// NOTATION DEMO — live preview of all teeth in selected system
+// ══════════════════════════════════════════════════════════════
+function renderNotationDemo() {
+  const nota = schema.notation || 'FDI';
+  const buildRow = (teeth, elementId, cssClass) => {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+    el.innerHTML = '';
+    teeth.forEach((num, i) => {
+      if (i === 8) {
+        const sep = document.createElement('div');
+        sep.className = 'ndemo-sep';
+        el.appendChild(sep);
+      }
+      const tooth = document.createElement('div');
+      tooth.className = 'ndemo-tooth ' + cssClass;
+      tooth.textContent = toothLabel(num, nota);
+      tooth.title = 'FDI: ' + num;
+      el.appendChild(tooth);
+    });
+  };
+  buildRow(UPPER_TEETH, 'notation-demo-upper', 'upper');
+  buildRow(LOWER_TEETH, 'notation-demo-lower', 'lower');
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -936,7 +940,11 @@ function addClinician() {
   loadClinicians();
 }
 
-document.getElementById('new-clinician').addEventListener('keydown', e => { if(e.key==='Enter') addClinician(); });
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('new-clinician').addEventListener('keydown', e => { if (e.key === 'Enter') addClinician(); });
+  document.getElementById('new-wire-size').addEventListener('keydown', e => { if (e.key === 'Enter') addWireOption('size'); });
+  document.getElementById('new-wire-mat').addEventListener('keydown',  e => { if (e.key === 'Enter') addWireOption('mat'); });
+});
 
 // ══════════════════════════════════════════════════════════════
 // WIRE OPTIONS
@@ -948,6 +956,7 @@ function loadWireOptions() {
 
 function renderSimpleList(containerId, arr, type) {
   const container = document.getElementById(containerId);
+  if (!container) return;
   container.innerHTML = '';
   arr.forEach((val, idx) => {
     const item = document.createElement('div');
@@ -977,20 +986,17 @@ function addWireOption(type) {
   loadWireOptions();
   document.getElementById(id).focus();
 }
-document.getElementById('new-wire-size').addEventListener('keydown', e => { if(e.key==='Enter') addWireOption('size'); });
-document.getElementById('new-wire-mat').addEventListener('keydown',  e => { if(e.key==='Enter') addWireOption('mat'); });
 
 // ══════════════════════════════════════════════════════════════
 // FORM FIELD RENDERER
 // ══════════════════════════════════════════════════════════════
-const FORM_KEYS = ['exam','plan','bond','fu-fixed','fu-aligner','emergency','debond'];
-
 function renderAllFormPanels() {
   FORM_KEYS.forEach(key => renderFormPanel(key));
 }
 
 function renderFormPanel(key) {
-  const container = document.getElementById('fields-' + key);
+  const containerId = 'fields-' + key;
+  const container = document.getElementById(containerId);
   if (!container) return;
   container.innerHTML = '';
   const fields = schema.fields[key] || [];
@@ -1018,24 +1024,23 @@ function buildFieldCard(formKey, field, fieldIdx) {
     pills:  { badge: 'badge-pills',  label: 'Clickable Pills' },
   }[field.type] || { badge: 'badge-text', label: field.type };
 
-  // header
   const hdr = document.createElement('div');
   hdr.className = 'card-header';
   hdr.innerHTML = `
     <div class="card-title">${esc(field.label)}</div>
     <span class="badge ${typeInfo.badge}">${typeInfo.label}</span>
-    <span style="font-size:0.69rem;color:var(--grey-400);margin-left:4px;">ID: ${esc(field.id)}</span>
+    <span style="font-size:0.67rem;color:var(--grey-400);margin-left:4px;">id: ${esc(field.id)}</span>
   `;
   card.appendChild(hdr);
 
-  // body
   const body = document.createElement('div');
   body.className = 'card-body';
 
-  // options list
   const listWrap = document.createElement('div');
   listWrap.className = 'options-list';
-  listWrap.id = `optlist-${formKey}-${fieldIdx}`;
+
+  const previewWrap = document.createElement('div');
+  previewWrap.className = 'preview-strip';
 
   const renderOpts = () => {
     listWrap.innerHTML = '';
@@ -1053,22 +1058,22 @@ function buildFieldCard(formKey, field, fieldIdx) {
       row.querySelector('.option-input').addEventListener('input', e => {
         field.options[optIdx] = e.target.value;
         renderPreview(previewWrap, field);
+        updateAllCounts();
       });
       row.querySelector('.btn-del').addEventListener('click', () => {
         field.options.splice(optIdx, 1);
         renderOpts();
         renderPreview(previewWrap, field);
+        updateAllCounts();
       });
       listWrap.appendChild(row);
     });
   };
 
-  // add row
   const addWrap = document.createElement('div');
   addWrap.className = 'add-row';
   const addInp = document.createElement('input');
-  addInp.type = 'text';
-  addInp.className = 'add-input';
+  addInp.type = 'text'; addInp.className = 'add-input';
   addInp.placeholder = 'Type new option and press Enter or click Add';
   const addBtn = document.createElement('button');
   addBtn.className = 'btn btn-primary btn-sm';
@@ -1080,15 +1085,12 @@ function buildFieldCard(formKey, field, fieldIdx) {
     addInp.value = '';
     renderOpts();
     renderPreview(previewWrap, field);
+    updateAllCounts();
     addInp.focus();
   };
-  addInp.addEventListener('keydown', e => { if(e.key==='Enter') addBtn.click(); });
+  addInp.addEventListener('keydown', e => { if (e.key === 'Enter') addBtn.click(); });
   addWrap.appendChild(addInp);
   addWrap.appendChild(addBtn);
-
-  // preview
-  const previewWrap = document.createElement('div');
-  previewWrap.className = 'preview-strip';
 
   body.appendChild(listWrap);
   body.appendChild(addWrap);
@@ -1097,12 +1099,11 @@ function buildFieldCard(formKey, field, fieldIdx) {
 
   renderOpts();
   renderPreview(previewWrap, field);
-
   return card;
 }
 
 function renderPreview(wrap, field) {
-  wrap.innerHTML = `<span class="preview-label">Preview — ${field.options.length} option${field.options.length!==1?'s':''}</span>` +
+  wrap.innerHTML = `<span class="preview-label">${field.options.length} option${field.options.length !== 1 ? 's' : ''}</span>` +
     field.options.filter(o => o.trim()).map(o =>
       `<span class="preview-chip">${esc(o)}</span>`
     ).join('');
@@ -1113,10 +1114,16 @@ function renderPreview(wrap, field) {
 // ══════════════════════════════════════════════════════════════
 function updateAllCounts() {
   const n = document.getElementById('cnt-clinicians');
-  if (n) n.textContent = schema.clinicians.filter(c=>c.trim()).length;
+  if (n) n.textContent = schema.clinicians.filter(c => c.trim()).length;
+
   FORM_KEYS.forEach(key => {
-    const el = document.getElementById('cnt-' + key);
-    if (el) el.textContent = (schema.fields[key]||[]).reduce((s,f)=>s+f.options.length,0);
+    // FIX: use correct element id matching sidebar nav ids
+    const elId = 'cnt-' + key;
+    const el = document.getElementById(elId);
+    if (el) {
+      const fields = schema.fields[key] || [];
+      el.textContent = fields.reduce((sum, f) => sum + f.options.length, 0);
+    }
   });
 }
 
@@ -1142,6 +1149,7 @@ function setupDrag(item, arr, rerender) {
     e.preventDefault(); item.classList.remove('drag-over');
     if (!dragSrc || dragSrc === item) return;
     const si = parseInt(dragSrc.dataset.idx), di = parseInt(item.dataset.idx);
+    if (isNaN(si) || isNaN(di)) return;
     const [moved] = arr.splice(si, 1);
     arr.splice(di, 0, moved);
     rerender();
@@ -1152,30 +1160,35 @@ function setupDrag(item, arr, rerender) {
 // SAVE ALL
 // ══════════════════════════════════════════════════════════════
 function saveAll() {
-  // Collect clinic settings
   collectClinicSettings();
 
-  // Collect clinicians from live inputs
+  // Collect clinicians from live DOM inputs
   schema.clinicians = [...document.querySelectorAll('#clinician-list .clinician-input')]
     .map(i => i.value.trim()).filter(Boolean);
 
-  // Collect wire options from live inputs
+  // Collect wire options from live DOM inputs
   schema.wireSizes = [...document.querySelectorAll('#wire-sizes-list .option-input')]
     .map(i => i.value.trim()).filter(Boolean);
   schema.wireMats  = [...document.querySelectorAll('#wire-mats-list .option-input')]
     .map(i => i.value.trim()).filter(Boolean);
 
-  // Collect all field options from live inputs
+  // Collect all field options from live DOM inputs
   FORM_KEYS.forEach(key => {
     (schema.fields[key] || []).forEach((field, fi) => {
-      const listEl = document.getElementById(`optlist-${key}-${fi}`);
-      if (!listEl) return;
-      const inputs = listEl.querySelectorAll('.option-input');
+      // Find the card for this form + field index
+      const containerEl = document.querySelector(`#fields-${key}`);
+      if (!containerEl) return;
+      const cards = containerEl.querySelectorAll('.card');
+      const card = cards[fi];
+      if (!card) return;
+      const inputs = card.querySelectorAll('.option-input');
       field.options = [...inputs].map(i => i.value.trim()).filter(Boolean);
     });
   });
 
   localStorage.setItem('ortho_admin_schema', JSON.stringify(schema));
+  // FIX: also write notation to dedicated key and broadcast update
+  localStorage.setItem('ortho_notation', schema.notation || 'FDI');
   localStorage.setItem('ortho_admin_update', Date.now().toString());
 
   updateAllCounts();
@@ -1190,7 +1203,7 @@ function exportSettings() {
   const blob = new Blob([JSON.stringify(schema, null, 2)], { type: 'application/json' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
-  a.href = url; a.download = 'ortho_admin_settings.json'; a.click();
+  a.href = url; a.download = 'easyortho_admin_settings.json'; a.click();
   URL.revokeObjectURL(url);
   showToast('📤 Settings exported!', 'success');
 }
@@ -1201,7 +1214,9 @@ function importSettings(input) {
   const reader = new FileReader();
   reader.onload = e => {
     try {
-      schema = JSON.parse(e.target.result);
+      const parsed = JSON.parse(e.target.result);
+      // FIX: merge imported settings over defaults so new keys are always present
+      schema = deepMerge(deepClone(DEFAULT_SCHEMA), parsed);
       init();
       showToast('📥 Settings imported successfully!', 'success');
     } catch {
@@ -1240,7 +1255,7 @@ function showToast(msg, type = 'success') {
   const t = document.getElementById('toast');
   t.textContent = msg; t.className = 'toast ' + type;
   setTimeout(() => t.classList.add('show'), 10);
-  setTimeout(() => t.classList.remove('show'), 3000);
+  setTimeout(() => t.classList.remove('show'), 3200);
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1251,7 +1266,7 @@ function esc(str) {
 }
 
 // ══════════════════════════════════════════════════════════════
-// KEYBOARD
+// KEYBOARD SHORTCUT
 // ══════════════════════════════════════════════════════════════
 document.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveAll(); }
